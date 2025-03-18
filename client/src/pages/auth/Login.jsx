@@ -58,22 +58,24 @@ export const Login = () => {
   const redirectUser = async (role) => {
     // if (role === "Client" || role === "Freelancer") {
     //   try {
-    //     // Fetch vendor details
+    //     // Fetch kyc details
     //     const response = await axios.get("/api/vendor/hasDetail");
   
-    //     // Check if the vendor has business details
-    //     const hasBusinessDetail = response.data?.hasBusinessDetail;
-    //     // console.log(hasBusinessDetail)
+    //     // Check if the role has KYC details
+    //     const kycVerified = response.data?.kycVerified;
+    //     // console.log(kycVerified)
   
-    //     // Redirect based on whether the vendor has business details
-    //     if (hasBusinessDetail) {
-    //       navigate("/vendor/dashboard"); // Redirect to vendor dashboard
+    //     // Redirect based on whether the role has business details
+    //     if (kycVerified && role === "Client") {
+    //       navigate("/client/dashboard"); // Redirect to client dashboard
+    //     } else if kycVerified && role === "Freelancer") {
+    //       navigate("/dashboard"); // Redirect to freelancer dashboard
     //     } else {
-    //       navigate("/completeDetails"); // Redirect to create business details page
+    //       navigate("/complete-profile"); // Redirect to create business details page
     //     }
     //   } catch (error) {
-    //     console.error("Error fetching vendor details:", error.message);
-    //     toast.error("Error checking vendor details.");
+    //     console.error(`Error fetching ${role} details:`, error.message);
+    //     toast.error(`Error checking ${role} details.`);
     //     navigate("/"); // Fallback in case of error
     //   }
     // } else {

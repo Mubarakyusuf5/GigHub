@@ -8,7 +8,7 @@ const app = express();
 
 // CORS Options
 const corsOptions = {
-  origin: "http://localhost:5173", // Set to the origin of your frontend
+  origin: process.env.CLIENT_URL, // Set to the origin of your frontend
   credentials: true,              
 };
 app.use(cookieParser());
@@ -18,9 +18,12 @@ app.options("*", cors(corsOptions));  // Preflight request handler
 
 // Your routes
 app.use("/auth", require("./Routes/authRoutes.js"));
-// app.use("/api/users", require("./Routes/userRoute.js")) 
+app.use("/api/user", require("./Routes/userRoute.js")) 
+app.use("/api/job", require("./Routes/jobRoute.js")) 
+// app.use("/api/KYC", require("./Routes/KYCRoute.js")) 
+app.use("/api/cat", require("./Routes/catRoute.js")) 
 
-const port = process.env.PORT || 6655;
+const port = process.env.PORT || 6655
 const url = process.env.MONGO_URL;
 
 mongoose.connect(url)

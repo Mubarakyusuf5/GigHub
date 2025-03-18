@@ -136,22 +136,6 @@ const displayVendorDetailById = async (req, res) => {
   }
 };
 
-// const hasDetail= async (req, res) => {
-//   const userId = req.user.id
-//   try {
-//     const vendor = await User.findById(userId);
-//     console.log(vendor)
-//     console.log(req.params.id)
-//     if (!vendor) {
-//       return res.status(404).json({ message: "Vendor not found" });
-//     }
-//     res.status(200).json({ hasBusinessDetail: vendor.hasBusinessDetail });
-//   } catch (error) {
-//     console.error("Error fetching vendor details:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// }
-
 const hasDetail = async (req, res) => {
   try {
     // Ensure the user is authenticated and has a valid ID
@@ -165,18 +149,24 @@ const hasDetail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
-    // if (user.role !== "vendor") {
-    //   return res.status(403).json({ message: "Access denied. Only vendors can check business details." });
-    // }
 
-    // Check if the vendor has business details
-    const vendorDetail = await VendorDetail.findOne({ userId });
+    // Check if the role has business details
+    if (user.role === "Client") {
+      const clientDetail = await FrnclrKYC.findOne({ userId });
+      
+      res.status(200).json({
+        message: "Vendor detail status fetched successfully",
+        kycVerified: clientDetail?.kycVerified || false,  // True if details exist, false otherwise
+      });
+    } else {
+      const FrnclrDetail = await FrnclrKYC.findOne({ userId });
+      res.status(200).json({
+        message: "Vendor detail status fetched successfully",
+        kycVerified: FrnclrDetail?.kycVerified || false,  // True if details exist, false otherwise
+      });
+    }
 
     // Return a boolean indicating whether business details exist
-    res.status(200).json({
-      message: "Vendor detail status fetched successfully",
-      hasBusinessDetail: vendorDetail?.hasBusinessDetail || false,  // True if details exist, false otherwise
-    });
   } catch (error) {
     console.error("Error in hasDetail function:", error);
     res.status(500).json({ message: "Internal server error." });

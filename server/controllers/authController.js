@@ -1,15 +1,19 @@
 const Users = require("../models/userModel.js");
 const { comparePassword, hashPassword } = require("../middlewares/hash.js");
 const { createToken } = require("../middlewares/jwt.js");
+const { sendEmail } = require("../middlewares/emailService.js");
+const fs = require("fs");
+const path = require("path");
+const handlebars = require("handlebars");
 
 const registerUser = async (req, res) => {
     try {
         const { fullname, email, password, role } = req.body;
 
-        const exist = await Users.findOne({ email });
-        if (exist) {
-            return res.status(400).json({ message: "Email already exists" });
-        }
+        // const exist = await Users.findOne({ email });
+        // if (exist) {
+        //     return res.status(400).json({ message: "Email already exists" });
+        // }
 
         const hashedPassword = await hashPassword(password);
         const newUser = await Users.create({
@@ -18,6 +22,15 @@ const registerUser = async (req, res) => {
             role,
             password: hashedPassword,
         });
+
+        // sends welcome email to registered user
+        // const login = `${process.env.CLIENT_URL}/login`,
+        // clientLink = `${process.env.CLIENT_URL}/client/dashboard`, freelancerLink=`${process.env.CLIENT_URL}/dashboard`
+        //   const templatePath = path.join(__dirname, "../templates/welcome-template.html");
+        //   const source = fs.readFileSync(templatePath, "utf-8");
+        //   const template = handlebars.compile(source);
+        //   const emailTemplate = template({ fullname, login, clientLink, freelancerLink });
+        // await sendEmail(email, "Welcome Email", emailTemplate);
 
         res.status(200).json({ message: "User registered successfully", newUser });
     } catch (error) {

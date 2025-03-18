@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Bars3Icon,
@@ -10,13 +10,29 @@ import {
 } from "@heroicons/react/24/outline";
 
 export const Nav = () => {
-  const user = "Freelancer";
+  const [isOpen, setIsOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const user = "Client";
+
+  ""
+
+  const toggleMenu = ()=>{
+    setIsOpen(isOpen => !isOpen)
+    console.log(isOpen ? "close" : "open")
+  }
+
+  const mobileMenu =()=>{
+
+  }
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-10">
+    <nav className={`bg-white shadow-sm sticky top-0 z-10 ${user === "Admin" ? "hidden" : ""}`}>
       <div className="px-4 lg:px-10">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={user === "Client" ?`/client/dashboard`: `/dashboard`} className="flex items-center space-x-2">
+          <Link
+            to={user === "Client" ? `/client/dashboard` : `/dashboard`}
+            className="flex items-center space-x-2"
+          >
             <img
               src="/placeholder.svg?height=40&width=40"
               width={40}
@@ -61,10 +77,16 @@ export const Nav = () => {
                     </div> */}
                   </div>
                 </div>
-                <Link to="/analytics" className="text-[#3A506B] hover:text-[#FF6B6B]">
+                <Link
+                  to="/analytics"
+                  className="text-[#3A506B] hover:text-[#FF6B6B]"
+                >
                   Analytics
                 </Link>
-                <Link to="/message" className="text-[#3A506B] hover:text-[#FF6B6B]">
+                <Link
+                  to="/message"
+                  className="text-[#3A506B] hover:text-[#FF6B6B]"
+                >
                   Messages
                   {/* <BellIcon className="ml-1 h-4 w-4" /> */}
                 </Link>
@@ -102,10 +124,16 @@ export const Nav = () => {
                     </div>
                   </div>
                 </div>
-                <Link to="/analytics" className="text-[#3A506B] hover:text-[#FF6B6B]">
+                <Link
+                  to="/analytics"
+                  className="text-[#3A506B] hover:text-[#FF6B6B]"
+                >
                   Analytics
                 </Link>
-                <Link to="/message" className="text-[#3A506B] hover:text-[#FF6B6B]">
+                <Link
+                  to="/message"
+                  className="text-[#3A506B] hover:text-[#FF6B6B]"
+                >
                   Messages
                 </Link>
               </>
@@ -126,9 +154,11 @@ export const Nav = () => {
 
           {/* CTA Buttons and Auth Links */}
           <div className="hidden lg:flex items-center space-x-4">
-          <BellIcon className=" h-6 w-6" />
-            Account
+            <BellIcon className={` h-7 w-7 cursor-pointer ${isOpen ? "text-red-500" : ""} `} />
+            <div onClick={toggleMenu} className="h-12 w-12 rounded-full object-cover bg-gray-300 cursor-pointer">
+              <img src="/placeholder.svg?height=40&width=40" alt="" className="h-full w-full rounded-full" />
             </div>
+          </div>
           <div className="lg:hidden">
             <Bars3Icon className="h-8 w-8 cursor-pointer " />
           </div>

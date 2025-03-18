@@ -2,7 +2,7 @@ import React from 'react'
 
 export const CategorySection = () => {
   return (
-    <section className="py-12 mb-16 bg-gray-50 bg-opacity-">
+    <section className="py-12 mb-16 bg-opacity-">
         <h2 className="text-3xl font-medium text-center mb-12">Explore Popular Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {[

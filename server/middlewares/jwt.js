@@ -5,16 +5,22 @@ const createToken = (user) => {
     const accessToken = jwt.sign(
         { id: user.id, email: user.email, fullname: user.fullname, role: user.role },
         process.env.JWT_ACCESS_KEY,
-        // { expiresIn: "1m" }
+        { expiresIn: "1m" }
     );
 
     const refreshToken = jwt.sign(
         { id: user.id, email: user.email, fullname: user.fullname, role: user.role },
         process.env.JWT_REFRESH_KEY,
-        // { expiresIn: "7d" }
+        { expiresIn: "7d" } //need jwt decode to check if expired thens log's out
     );
 
-    return { accessToken, refreshToken };
+    const resetToken = jwt.sign(
+        { id: user.id },
+        process.env.JWT_RESET_KEY,
+        { expiresIn: "15m" } // Token expires in 15 minutes
+    );
+
+    return { accessToken, refreshToken, resetToken };
 };
 
 const VerifyToken = (req, res, next) => {
@@ -35,6 +41,23 @@ const VerifyToken = (req, res, next) => {
         return res.status(400).json({ message: "Invalid Token" });
     }
 };
+
+const VerifyResetToken = (req, res, next) => {
+    const { resetToken } = req.body; 
+
+    if (!resetToken) {
+        return res.status(400).json({ message: "Reset token is required" }); 
+    }
+
+    try {
+        const validToken = jwt.verify(resetToken, process.env.JWT_RESET_KEY);
+        req.user = validToken; 
+        return next();
+    } catch (err) {
+        return res.status(400).json({ message: "Invalid or Expired Reset Token", err });
+    }
+};
+
 
 const renewToken = (req, res) => {
     const refreshToken = req.cookies["refreshToken"];
@@ -59,5 +82,6 @@ const renewToken = (req, res) => {
 
 module.exports = {
     createToken,
-    VerifyToken
+    VerifyToken,
+    VerifyResetToken
 };

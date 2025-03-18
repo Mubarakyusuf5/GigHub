@@ -19,17 +19,17 @@ import {
 
 export const Section3 = () => {
   return (
-    <section className="py-12">
+    <section className="py-10">
         <h2 className="text-3xl font-bold text-center mb-12">Getting Started is Simple</h2>
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="relative aspect-square">
+        <div className="flex justify-center space-x-52 items-center">
+          {/* <div className="relative aspect-square">
             <img
               src="/placeholder.svg?height=400&width=400"
               alt="How it works illustration"
               className="rounded-lg"
             />
-          </div>
-          <div className="space-y-8">
+          </div> */}
+          {/* <div className="space-y-8"> */}
             <div>
               <h3 className="text-2xl font-semibold mb-4">For Clients</h3>
               <ul className="space-y-4">
@@ -63,7 +63,7 @@ export const Section3 = () => {
               </ul>
             </div>
           </div>
-        </div>
+        {/* </div> */}
       </section>
   )
 }

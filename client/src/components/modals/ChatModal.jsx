@@ -6,6 +6,10 @@ import {
   EllipsisVerticalIcon,
   TrashIcon,
   ClipboardIcon,
+  EllipsisHorizontalCircleIcon,
+  EllipsisHorizontalIcon,
+  ArrowRightEndOnRectangleIcon,
+  ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 
 const mockMessages = [
@@ -18,6 +22,19 @@ const mockMessages = [
   { id: 3, sender: "User", content: "I have a question about React hooks." },
   {
     id: 4,
+    sender: "AI",
+    content:
+      "Sure, I'd be happy to help with any questions you have about React hooks. What specifically would you like to know?",
+  },
+  {
+    id: 5,
+    sender: "AI",
+    content:
+      "Sure, I'd be happy to help with any questions you have about React hooks. What specifically would you like to know?",
+  },
+  { id: 6, sender: "User", content: "Its good" },
+  {
+    id: 7,
     sender: "AI",
     content:
       "Sure, I'd be happy to help with any questions you have about React hooks. What specifically would you like to know?",
@@ -43,14 +60,14 @@ export const ChatModal = () => {
   };
 
   return (
-    <div className="bg-black bg-opacity-55 min-h-screen px-4 lg:px-[160px] fixed top-0 left-0 w-full z-20 flex justify-center items-center">
-      <div className="bg-white w-full h-[95vh] rounded-lg flex flex-col">
+    <div className="h-[calc(100vh - 4rem)] lg:h-full absolute bottom-0 sm:top-0 top-[4rem] lg:top-0 left-0 w-full">
+      <div className="bg-white w-full h-full flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">Chat with AI</h2>
-          <button className="text-gray-500 hover:text-gray-700">
-            <XMarkIcon className="h-6 w-6" />
+        <div className="flex justify-start items-center p-3 border-b space-x-4 lg:space-x-0">
+          <button className="lg:hidden text-gray-500 hover:text-gray-700">
+            <ArrowLeftIcon className="h-6 w-6" />
           </button>
+          <h2 className="text-xl font-semibold">Chat with AI</h2>
         </div>
 
         {/* Chat messages */}
@@ -63,7 +80,7 @@ export const ChatModal = () => {
               } group relative`}
             >
               <div
-                className={`relative max-w-[70%] p-3 rounded-lg flex items-center space-x-2 ${
+                className={`relative max-w-[50%] p-3 rounded-lg flex items-center space-x-2 ${
                   message.sender === "User"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 text-gray-800"
@@ -72,13 +89,17 @@ export const ChatModal = () => {
                 <span>{message.content}</span>
                 <button
                   onClick={() => toggleMenu(message.id)}
-                  className="p-1 rounded-full bg-white shadow-md opacity-100 focus:outline-none"
+                  className={`p-1 rounded-full absolute ${
+                    message.sender === "User" ? "-left-10" : "-right-9"
+                  } bg-white  opacity-100 focus:outline-none`}
                 >
-                  <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
+                  <EllipsisHorizontalIcon className="h-5 w-5 text-gray-500" />
                 </button>
-              </div>
               {activeMenu === message.id && (
-                <div className="absolute top-full right-[300px] mt-1 bg-white rounded-md shadow-lg z-10 w-28">
+                <div className={`absolute  ${
+                  message.sender === "User" ? "-left-40" : "-right-[160px]"
+                } mt-1  top-1 bg-white rounded-md shadow-lg z-10 w-28 text-black
+              `}>
                   <button
                     onClick={() => handleDelete(message.id)}
                     className="flex items-center px-4 py-2 hover:bg-gray-100 w-full"
@@ -95,12 +116,13 @@ export const ChatModal = () => {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           ))}
         </div>
 
         {/* Input area */}
-        <div className="border-t p-4">
+        <div className="border-t p-3">
           <div className="flex items-center space-x-2">
             <button className="text-gray-500 hover:text-gray-700">
               <PaperClipIcon className="h-5 w-5" />

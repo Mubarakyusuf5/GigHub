@@ -1,46 +1,60 @@
 import React, { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 import { ClipLoader } from "react-spinners" 
 
-export const UpdatePass = () => {
+export const ResetPass = () => {
+  const { token } = useParams();
   const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
-      oldPassword: "",
       cPassword: "",
       password: "",
     })
     const navigate = useNavigate()
 
     useEffect(()=>{
-      document.title = "Update Password? | GigHub"
+      document.title = "Reset Password? | GigHub"
+    },[navigate])
+
+    useEffect(()=>{
+      console.log(token)
+      const checkToken = async () => {
+        try {
+          await axios.get(`/check-token/${token}`);
+        }
+        catch (error) {
+          toast.error(error.response?.data?.message);
+          navigate("/login");
+      }
+    }
+
+      checkToken()
     },[])
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { oldPassword, password, cPassword } = formData;
+    const { password, cPassword } = formData;
 
-    if (!oldPassword) return toast.error("Must input old password for confirmation!");
     if (!password || !cPassword) return toast.error("All fields must be filled!");
     if (password !== cPassword) return toast.error("New password doesn't match!");
 
     try {
       setLoading(true);
-      const response = await axios.post("/api/auth/updatePassword", {
-        oldPassword, 
-        // old password to be sent to backend for comfirmation
+      const response = await axios.post(`/auth/resetPassword`, {
+        resetToken: token,
         newPassword: password,
         // newPassword is saved as password in backend
       });
 
-      toast.success(response.data.message || "Password updated successfully!");
-      setFormData({ oldPassword: "", password: "", cPassword: "" });
+      toast.success(response.data.message || "Password reset successfully!");
+      setFormData({ password: "", cPassword: "" });
       navigate("/login")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update password!");
+      toast.error(error.response?.data?.message || "Failed to reset password!");
     } finally {
       setLoading(false);
     }
@@ -49,22 +63,8 @@ export const UpdatePass = () => {
   return (
     <div className="flex justify-center p-4 lg:p-0 min-h-screen font-poppins items-center bg-white text-black">
       <form onSubmit={handleSubmit} className="border-2 rounded-md p-8 w-[410px] ">
-        <h1 className="text-2xl text-center font-medium  mb-1 ">Update your password?</h1>
+        <h1 className="text-2xl text-center font-medium  mb-1 ">Reset your password?</h1>
         <p className="text-sm mb-5 text-center"></p>
-
-        <div className="mb-3">
-          <label htmlFor="oldPassword" className="block text-sm font-medium mb-1">
-            Enter Old Password
-          </label>
-          <input
-            type="password"
-            placeholder="Enter old password"
-            id="oldPassword"
-            className="w-full text-[15px] font-inter px-3 py-2  rounded-md border border-slate-400 focus:ring-2 focus:ring-zinc-200 focus:border-transparent"
-            name="oldPassword"
-            onChange={handleChange}
-          />
-        </div>
 
         <div className="mb-3">
           <label htmlFor="password" className="block text-sm font-medium mb-1">

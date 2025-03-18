@@ -10,17 +10,20 @@ const UserSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
       match: [/.+\@.+\..+/, "Please fill a valid email address"],
     },
     password: {
       type: String,
       required: true,
+      trim: true,
     },
     role: {
       type: String,
       enum: ["Admin", "Freelancer", "Client"],
-      // default: "Attendee"
     },
+    resetToken: { type: String, expires: 900 }, // Token for password reset
+    resetTokenExpires: { type: Date }, // Expiry date for reset token
     status: {
       type: String,
       enum: ["Active", "Suspended", "Blocked"],

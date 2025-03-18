@@ -2,6 +2,6 @@ import React from 'react'
 
 export const ViewPostModal = () => {
   return (
-    <div>ViewPostModal</div>
+    <div>ViewPostModal for freelancer</div>
   )
 }

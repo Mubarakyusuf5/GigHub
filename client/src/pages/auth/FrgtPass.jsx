@@ -16,9 +16,26 @@ export const FrgtPass = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
-  const handleSubmit = (e)=>{
+  const handleSubmit = async (e)=>{
     e.preventDefault()
+    const { email } = formData
 
+    if (!email) {
+      return toast.error("All inputs must be filled!")
+    }
+    setLoading(true)
+    try {
+      const response = await axios.post("/auth/forgotPassword", formData);
+      // console.log(response)
+      const message = response.data.message;
+      setLoading(false);
+      formData.email = "";
+      // navigate("/login")    
+      toast.success(message || "Reset has been sent to your email");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred. Please try again.");
+      setLoading(false); // Stop loading regardless of success or error
+    } 
   }
   return (
     <div className="flex justify-center p-4 lg:p-0 min-h-screen font-poppins items-center bg-white text-black">

@@ -4,7 +4,7 @@ import { ClientKYC } from '../client/ClientKYC'
 
 export const CompleteProfile = () => {
   // const { user } = useAuth()
-  const user = "Freelancer"
+  const user = "Client"
   return (
     <div>
       {user === "Freelancer" && <FrlncrKYC />}

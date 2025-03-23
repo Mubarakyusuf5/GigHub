@@ -17,10 +17,11 @@ export const FrlncrKYC = () => {
     title: "",
     skills: [],
     bio: "",
+    state: "",
     experienceLevel: "",
-    availability: "",
-    accntName: "",
-    accntNumber: "",
+    bankName: "",
+    accountName: "",
+    accountNumber: "",
     paymentMethod: "",
     portfolio: "",
     github: "",
@@ -172,8 +173,7 @@ export const FrlncrKYC = () => {
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               {step === 1 && "Tell us about yourself and your expertise"}
-              {step === 2 &&
-                "Let clients know skills you're expert in"}
+              {step === 2 && "Let clients know skills you're expert in"}
               {step === 3 && "Share your work and professional profiles"}
               {step === 4 && "Review your information before finalizing"}
             </p>
@@ -270,7 +270,10 @@ export const FrlncrKYC = () => {
             {step === 2 && (
               <div className="space-y-6">
                 <div>
-                  <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="skills"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Skills
                   </label>
                   <div className="flex gap-2 mb-2">
@@ -282,8 +285,8 @@ export const FrlncrKYC = () => {
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       onKeyDown={(e) => {
                         if (e && e.key === "Enter") {
-                          e.preventDefault()
-                          addSkill()
+                          e.preventDefault();
+                          addSkill();
                         }
                       }}
                     />
@@ -297,7 +300,10 @@ export const FrlncrKYC = () => {
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.skills.map((skill, index) => (
-                      <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
+                      >
                         {skill}
                         <button
                           onClick={() => removeSkill(skill)}
@@ -388,13 +394,9 @@ export const FrlncrKYC = () => {
                       Select your Bank Name
                     </option>
                     <option value="full-time">UBA</option>
-                    <option value="part-time">
-                      FCMB
-                    </option>
+                    <option value="part-time">FCMB</option>
                     <option value="limited">OPAY</option>
-                    <option value="occasional">
-                      KUDA
-                    </option>
+                    <option value="occasional">KUDA</option>
                   </select>
                 </div>
 

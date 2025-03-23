@@ -293,7 +293,7 @@ export const FreeDash = () => {
 // Job Card Component
 const JobCard = ({ job, onSave, onView }) => {
   return (
-    <div className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer"  >
+    <div className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer mb-6"  >
       <div className="flex justify-between">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">
           {job.title}

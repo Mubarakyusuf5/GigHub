@@ -6,7 +6,7 @@ const FreelancerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    }, // if not referenced in user model, add the user fields here
+    }, // instead of using user schema, i will this model to get user details
     title: { type: String, required: true }, // e.g. Full-stack Developer
     bio: { type: String, required: true },
     skills: [{ type: String, required: true }],
@@ -26,15 +26,15 @@ const FreelancerSchema = new mongoose.Schema(
       accountName: { type: String, required: true },
       accountNumber: { type: String, required: true },
     },
-    profilePicture: { type: String, default: "", required: true }, // Cloud storage URL
-    kycVerified: { type: Boolean, default: false },
+    profilePicture: { type: String, required: true }, // Cloud storage URL
+    hasProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
 
-const FrlcrKYC = mongoose.model("FreelancerKYC", FreelancerSchema);
+const Freelancer = mongoose.model("FreelancerProfile", FreelancerSchema);
 
 const ClientSchema = new mongoose.Schema(
   {
@@ -59,14 +59,14 @@ const ClientSchema = new mongoose.Schema(
       accountName: { type: String, required: true },
       accountNumber: { type: String, required: true },
     },
-    profilePicture: { type: String, default: "", required: true }, // Cloud storage URL
-    kycVerified: { type: Boolean, default: false },
+    profilePicture: { type: String, required: true }, // Cloud storage URL
+    hasProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
 
-const ClientKYC = mongoose.model("ClientKYC", ClientSchema);
+const Client = mongoose.model("ClientProfile", ClientSchema);
 
-module.exports = { FrlcrKYC, ClientKYC };
+module.exports = { Freelancer, Client };

@@ -20,7 +20,7 @@ app.options("*", cors(corsOptions));  // Preflight request handler
 app.use("/auth", require("./Routes/authRoutes.js"));
 app.use("/api/user", require("./Routes/userRoute.js")) 
 app.use("/api/job", require("./Routes/jobRoute.js")) 
-// app.use("/api/KYC", require("./Routes/KYCRoute.js")) 
+// app.use("/api/profile", require("./Routes/profileRoute.js")) 
 app.use("/api/cat", require("./Routes/catRoute.js")) 
 
 const port = process.env.PORT || 6655

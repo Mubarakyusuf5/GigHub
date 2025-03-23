@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { formatNaira } from "../../components/Data";
+import { ClipLoader } from "react-spinners";
 
 export const ProposalPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -226,17 +227,6 @@ export const ProposalPage = () => {
                       Estimated Duration
                     </label>
                     <div className="relative">
-                      {/* <ClockIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" /> */}
-                      {/* <input
-                        id="estimatedDuration"
-                        name="estimatedDuration"
-                        type="text"
-                        placeholder="e.g., 4 weeks"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        value={proposal.estimatedDuration}
-                        onChange={handleInputChange}
-
-                      /> */}
                       <select
                         id="duration"
                         name="duration"
@@ -264,17 +254,6 @@ export const ProposalPage = () => {
                       Payment Type
                     </label>
                     <div className="relative">
-                      {/* <ClockIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" /> */}
-                      {/* <input
-                        id="payment"
-                        name="payment"
-                        type="text"
-                        placeholder="e.g., 4 weeks"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        value={proposal.payment}
-                        onChange={handleInputChange}
-
-                      /> */}
                       <select
                         id="payment"
                         name="payment"
@@ -290,6 +269,8 @@ export const ProposalPage = () => {
                       </select>
                     </div>
                   </div>
+
+                  {proposal.payment === "Milestone" && <div>Milestone was selected</div>}
 
                   <div className="space-y-2">
                     <label
@@ -396,7 +377,7 @@ export const ProposalPage = () => {
                     >
                       {isSubmitting ? (
                         <span className="flex items-center">
-                          <svg
+                          {/* <svg
                             className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -415,7 +396,8 @@ export const ProposalPage = () => {
                               fill="currentColor"
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
-                          </svg>
+                          </svg> */}
+                          <ClipLoader className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" />
                           Submitting Proposal...
                         </span>
                       ) : (

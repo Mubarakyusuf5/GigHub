@@ -4,20 +4,20 @@ const { VerifyToken } = require("../middlewares/jwt.js");
 const authorizeRoles = require("../middlewares/RoleMiddleware.js");
 const {
   createFreelancer,
-  getFreelancer,
+  displayFreelancer,
   updateFreelancer,
   deleteFreelancer,
   createClient,
   getClient,
   updateClient,
   deleteClient,
-} = require("../controllers/KYCController");
+} = require("../controllers/profileController.js");
 
 
 // router.get("/hasDetail", VerifyToken, authorizeRoles("Admin","Vendor"),hasDetail);
 // Freelancer routes
 router.post("/createFrlncrKYC", createFreelancer);
-router.get("/displayFrlncrKYC/:id", getFreelancer);
+router.get("/displayFrlncrKYC/:id", displayFreelancer);
 router.put("/updateFrlncrKYC/:id", updateFreelancer);
 router.delete("/deleteFrlncrKYC/:id", deleteFreelancer);
 

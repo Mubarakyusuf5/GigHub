@@ -8,6 +8,7 @@ export const Sidebar = () => {
     { title: "Manage Users", url: "/admin/manage-users", icon: UserGroupIcon },
     { title: "Manage Categories", url: "/admin/manage-categories", icon: UserGroupIcon },
     { title: "Transactions", url: "/admin/transactions", icon: UserGroupIcon },
+    { title: "Payment Request", url: "/admin/payment", icon: UserGroupIcon },
     { title: "Analytics", url: "/analytics", icon: ChartPieIcon },
   ];
   return (

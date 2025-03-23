@@ -18,14 +18,17 @@ import { Nav } from "./components/utils/Nav";
 import { Analytics } from "./pages/general/Analytics";
 import { ResetPass } from "./pages/auth/ResetPass";
 import { JobDetail } from "./pages/client/JobDetail";
-import { KYC } from "./pages/general/KYC";
-import { SkillSelector } from "./components/modals/job/SkillSelector";
-import { JobModa } from "./components/modals/job/JobModa";
+// import { KYC } from "./pages/general/KYC";
+// import { SkillSelector } from "./components/modals/job/SkillSelector";
+// import { JobModa } from "./components/modals/job/JobModa";
 import { Transactions } from "./pages/admin/Transactions";
 import { Profile } from "./pages/general/Profile";
 import { FrlncrJobDetail } from "./pages/freelancer/FrlncrJobDetail";
 import { ProposalPage } from "./pages/freelancer/ProposalPage";
 import { ViewProposal } from "./components/modals/job/ViewProposal";
+import { CompleteProfile } from "./pages/general/CompleteProfile";
+import { TokenExpiryModal } from "./components/modals/TokenExpiryModal";
+import { Preview } from "./pages/client/Preview";
 
 axios.defaults.baseURL = "http://localhost:6500";
 axios.defaults.withCredentials = true;
@@ -43,6 +46,7 @@ export const App = () => {
     <div>
       {/* <HomeNav /> */}
       <Toaster position="top-center" duration={3000} />
+      <TokenExpiryModal />
       {/* {user === "Client" || user === "Freelancer" ?
       (!isSignInPage && !isSignupPage && !isFrgtPage  && !isOTPPage && !isResetPage && !isKYCPage && <Nav />) :
       user === "Admin" ? (<p className='hidden'>admin</p>)
@@ -65,22 +69,26 @@ export const App = () => {
         {/* <Route path="/verify-otp" element={<VerifyOTP />} /> */}
         <Route path="/message" element={<Message />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/complete-profile" element={<KYC />} />
+        <Route path="/complete-profile" element={<CompleteProfile />} />
         <Route path="/viewProposal" element={<ViewProposal />} />
+        <Route path="/preview" element={<Preview />} />
         {/* <Route path="/SkillSelector" element={<SkillSelector />} /> */}
 
+{/* admin */}
         <Route path="/admin/dashboard" element={<AdminDash />} />
         <Route path="/admin/manage-users" element={<ManageUser />} />
         <Route path="/admin/manage-categories" element={<ManageCtgry />} />
         <Route path='/admin/transactions' element={<Transactions />} />
 
+{/* Client */}
         <Route path="/client/dashboard" element={<ClientDash />} />
         <Route path="/client/job-details/:id" element={<JobDetail />} />
 
+{/* Freelancer */}
         <Route path="/dashboard" element={<FreeDash />} />
         <Route path="/job-detail/:id" element={<FrlncrJobDetail />} />
         <Route path="/proposal/:id" element={<ProposalPage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:id" element={<Profile />} />
 
         <Route
           path="/unauthorized"

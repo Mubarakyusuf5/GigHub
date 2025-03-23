@@ -70,15 +70,21 @@ const jobSchema = new mongoose.Schema(
     },
     hired: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Assigned freelancer (if hired)
+        freelancer: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User", // Assigned freelancer (if hired)
+        },
+        hiredOn: {
+          type: Date,
+          required: true
+        }
       },
     ],
     messaged: [
       {
         freelancer: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // Assigned freelancer (if hired)
+          ref: "User", // Assigned freelancer (if messaged)
         },
         status: { type: Boolean, default: false },
       },
@@ -93,7 +99,8 @@ const jobSchema = new mongoose.Schema(
           },
           submittedOn: {
             type: Date,
-            default: Date.now,
+            required: true
+            // default: Date.now,
           },
           coverLetter: {
             type: String,

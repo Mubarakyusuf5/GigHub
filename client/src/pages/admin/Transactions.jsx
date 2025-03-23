@@ -245,7 +245,7 @@ export const Transactions = () => {
           <div className="flex flex-col gap-6 mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <h1 className="text-2xl md:text-3xl font-bold text-[#00539c] font-poppins">
-                Transactions
+                Transaction History
               </h1>
             </div>
 

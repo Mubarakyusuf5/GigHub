@@ -318,7 +318,7 @@ console.log(cleanedFormData)
                   <option value="Intermediate">Intermediate</option>
                   <option value="Expert">Expert</option>
                 </select>
-              </div>
+              </div> 
 
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">

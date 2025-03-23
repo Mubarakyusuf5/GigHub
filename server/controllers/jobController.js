@@ -125,7 +125,7 @@ exports.deleteJob = async (req, res) => {
 exports.hireFreelancer = async (req, res) => {
   try {
     const { freelancer } = req.body;
-
+// console.log(freelancer)
     // Validate freelancerId
     if (!freelancer) {
       return res.status(400).json({ message: "Freelancer ID is required" });
@@ -140,15 +140,18 @@ exports.hireFreelancer = async (req, res) => {
     // Use $addToSet to prevent duplicates and ensure atomic update
     const updatedJob = await Job.findByIdAndUpdate(
       req.params.id,
-      { $addToSet: { hired: freelancer } }, 
+      { $push: { hired: {freelancer, hiredOn: new Date()} } }, 
       { new: true }
     );
 
     res.status(200).json({ message: "Freelancer hired successfully", job: updatedJob });
   } catch (error) {
-    res.status(500).json({ message: "Error hiring freelancer", error: error.message });
+    res.status(500).json({ message: "Error hiring freelancer", error});
+    console.log(error)
   }
 };
+
+exports.removeHiredFreelancer = async (req, res) => {}
 
 // Submission of proposals (Client only)
 exports.submitProposal = async (req, res) => {
@@ -180,6 +183,7 @@ exports.submitProposal = async (req, res) => {
       bidAmount,
       payment,
       milestone,
+      subnittedOn: new Date()
     };
 
     // Add the new proposal

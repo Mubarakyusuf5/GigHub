@@ -22,6 +22,11 @@ const UserSchema = mongoose.Schema(
       type: String,
       enum: ["Admin", "Freelancer", "Client"],
     },
+    monnifyAccount: {
+      bankName: String,
+      accountNumber: String,
+      accountReference: String,
+    },
     resetToken: { type: String, expires: 900 }, // Token for password reset
     resetTokenExpires: { type: Date }, // Expiry date for reset token
     status: {

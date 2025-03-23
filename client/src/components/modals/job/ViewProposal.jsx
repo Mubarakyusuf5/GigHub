@@ -12,7 +12,7 @@ import {
   FlagIcon,
 } from "@heroicons/react/24/outline"
 
-export const ViewProposal = ({ onClose, jobData }) => {
+export const ViewProposal = ({ onClose, proposalData }) => {
     
 // const [selectedUser, setSelectedUser] = useState(null)
   // Sample proposals data - in a real app, this would be passed as props
@@ -95,7 +95,7 @@ export const ViewProposal = ({ onClose, jobData }) => {
                     Cover Letter
                   </h2>
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-gray-700 text-sm">{jobData?.coverLetter}</p>
+                    <p className="text-gray-700 text-sm">{proposalData?.coverLetter}</p>
                   </div>
                 </div>
 
@@ -105,7 +105,7 @@ export const ViewProposal = ({ onClose, jobData }) => {
                     <ClockIcon className="h-4 w-4 mr-1.5 text-blue-600" />
                     Duration
                   </h2>
-                  <p className="text-gray-900 font-medium">{jobData?.duration}</p>
+                  <p className="text-gray-900 font-medium">{proposalData?.duration}</p>
                 </div>
               </div>
 
@@ -116,7 +116,7 @@ export const ViewProposal = ({ onClose, jobData }) => {
                     <CurrencyDollarIcon className="h-4 w-4 mr-1.5 text-blue-600" />
                     Bid Amount
                   </h2>
-                  <p className="text-gray-900 font-medium text-lg">${jobData?.bidAmount}</p>
+                  <p className="text-gray-900 font-medium text-lg">${proposalData?.bidAmount}</p>
                 </div>
 
                 {/* Payment */}
@@ -126,14 +126,14 @@ export const ViewProposal = ({ onClose, jobData }) => {
                     Payment Type
                   </h2>
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {jobData?.payment}
+                    {proposalData?.payment}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Milestone Section - Only show if payment type is "Milestone" */}
-            {jobData?.payment === "Milestone" && (
+            {proposalData?.payment === "Milestone" && (
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider flex items-center mb-3">
                   <FlagIcon className="h-4 w-4 mr-1.5 text-blue-600" />
@@ -141,7 +141,7 @@ export const ViewProposal = ({ onClose, jobData }) => {
                 </h2>
 
                 <div className="space-y-2">
-                  {jobData?.milestone.map((milestone, index) => (
+                  {proposalData?.milestone.map((milestone, index) => (
                     <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
                         <span className="flex items-center justify-center w-5 h-5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium mr-2 flex-shrink-0">

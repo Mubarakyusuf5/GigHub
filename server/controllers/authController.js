@@ -1,42 +1,72 @@
 const Users = require("../models/userModel.js");
 const { comparePassword, hashPassword } = require("../middlewares/hash.js");
 const { createToken } = require("../middlewares/jwt.js");
-const { sendEmail } = require("../middlewares/emailService.js");
+const { sendEmail } = require("../services/emailService.js");
 const fs = require("fs");
 const path = require("path");
 const handlebars = require("handlebars");
+// const { createReservedAccount } = require("../services/monnifyService");
 
 const registerUser = async (req, res) => {
     try {
         const { fullname, email, password, role } = req.body;
 
-        // const exist = await Users.findOne({ email });
-        // if (exist) {
-        //     return res.status(400).json({ message: "Email already exists" });
-        // }
+        // Check if user already exists
+        const exist = await Users.findOne({ email });
+        if (exist) {
+            return res.status(400).json({ message: "Email already exists" });
+        }
 
+        // Hash the password
         const hashedPassword = await hashPassword(password);
-        const newUser = await Users.create({
+
+        // Prepare user data
+        let userData = {
             fullname,
             email,
             role,
             password: hashedPassword,
+        };
+
+        // will be moved to a separate route called /client/profile
+        // Create Monnify Reserved Account ONLY for Clients
+        // if (role === "Client") {
+        //     const accountReference = `CLIENT_${Date.now()}`;
+        //     const monnifyAccount = await createReservedAccount(email, accountReference, fullname);
+
+        //     userData.monnifyAccount = {
+        //         bankName: monnifyAccount.bankName,
+        //         accountNumber: monnifyAccount.accountNumber,
+        //         accountReference: accountReference,
+        //     };
+        // }
+
+        // Create user in database
+        const newUser = await Users.create(userData);
+
+        // Send welcome email
+        const login = `${process.env.CLIENT_URL}/login`;
+        const clientLink = `${process.env.CLIENT_URL}/client/dashboard`;
+        const freelancerLink = `${process.env.CLIENT_URL}/dashboard`;
+
+        const templatePath = path.join(__dirname, "../templates/welcome-template.html");
+        const source = fs.readFileSync(templatePath, "utf-8");
+        const template = handlebars.compile(source);
+        const emailTemplate = template({ fullname, login, clientLink, freelancerLink });
+
+        await sendEmail(email, "Welcome Email", emailTemplate);
+
+        res.status(200).json({
+            message: "User registered successfully",
+            newUser,
         });
 
-        // sends welcome email to registered user
-        // const login = `${process.env.CLIENT_URL}/login`,
-        // clientLink = `${process.env.CLIENT_URL}/client/dashboard`, freelancerLink=`${process.env.CLIENT_URL}/dashboard`
-        //   const templatePath = path.join(__dirname, "../templates/welcome-template.html");
-        //   const source = fs.readFileSync(templatePath, "utf-8");
-        //   const template = handlebars.compile(source);
-        //   const emailTemplate = template({ fullname, login, clientLink, freelancerLink });
-        // await sendEmail(email, "Welcome Email", emailTemplate);
-
-        res.status(200).json({ message: "User registered successfully", newUser });
     } catch (error) {
+        console.error("Registration Error:", error);
         res.status(500).json({ message: "Internal server error", error });
     }
 };
+
 
 const loginUser = async (req, res) => {
     try {

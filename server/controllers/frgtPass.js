@@ -2,9 +2,10 @@ const User = require("../models/userModel");
 const fs = require("fs");
 const path = require("path");
 const handlebars = require("handlebars");
-const { sendEmail } = require("../middlewares/emailService");
+// const { sendEmail } = require("../middlewares/emailService");
 const { hashPassword, comparePassword } = require("../middlewares/hash");
 const { createToken } = require("../middlewares/jwt");
+const { sendEmail } = require("../services/emailService");
 
 // forgot password logic
 const frgtPass = async (req, res) => {

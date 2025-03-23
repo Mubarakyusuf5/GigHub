@@ -18,7 +18,7 @@ router.get("/displayJobById/:id", displayJobById);
 router.post("/createJobs", createJob);
 router.put("/updateJob/:id", updateJob);
 router.delete("/deletejob/:id", deleteJob);
-router.post("/hireFreelancer/id", hireFreelancer);
+router.post("/hireFreelancer/:id", hireFreelancer);
 router.post("/submitProposal/:id", submitProposal);
 
 module.exports = router;

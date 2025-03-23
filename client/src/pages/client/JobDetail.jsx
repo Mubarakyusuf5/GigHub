@@ -13,22 +13,22 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { formatNaira } from "../../components/Data";
 import { ViewProposal } from "../../components/modals/job/ViewProposal";
 
 export const JobDetail = () => {
   const [activeTab, setActiveTab] = useState("jobs");
   const [jobs, setJobs] = useState({});
-  const [showModal, setShowModal] = useState(false)
-  const [selectedJob, setSelectedJob] = useState(null)
+  const [showModal, setShowModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [isFreelancer, setFreelancer] = useState({});
   const { id } = useParams(); // Extract user ID from the URL
   // const navigate = useNavigate();
 
   const fetchJobDetails = async () => {
     try {
       const response = await axios.get(`/api/job/displayJobById/${id}`);
-
       setJobs(response?.data);
     } catch (error) {
       toast.error(
@@ -40,6 +40,41 @@ export const JobDetail = () => {
   useEffect(() => {
     fetchJobDetails();
   }, [id]);
+
+  const fetchFreelancer = async()=>{
+    try {
+      const response = await axios.get("/api/user/displayUser") //fetch from profile controller instead of user
+      if (!jobs.skills) return; // Ensure `jobs.skills` is available
+
+      const filteredFreelancers = response.data.filter(f => 
+        Array.isArray(f.skills) 
+          ? f.skills.includes(jobs.skills) 
+          : f.skills === jobs.skills
+      );
+      setFreelancer(filteredFreelancers);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "error")
+    }
+  }
+  // console.log(isFreelancer.map((f, index)=>(
+  //   f.fullname
+  // )))
+
+useEffect(()=>{
+  fetchFreelancer()
+},[])
+
+  const hireFreelancer = async (freelancer) => {
+    try {
+      const response = await axios.post(`/api/job/hireFreelancer/${id}`, {
+        freelancer,
+      });
+      toast.success(response.data.message || "Freelancer hired successfully");
+      fetchJobDetails();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error hiring freelancer");
+    }
+  };
 
   const tabs = [
     {
@@ -62,43 +97,28 @@ export const JobDetail = () => {
       tab: "hire",
       icon: <DocumentTextIcon className="w-4 h-4" />,
     },
+    {
+      title: "Payment",
+      tab: "payment",
+      icon: <DocumentTextIcon className="w-4 h-4" />,
+    },
   ];
 
-  const handleViewModal = (jobData) => {
-    setSelectedJob(jobData);
+  const handleViewModal = (proposal) => {
+    setSelectedJob(proposal);
     setShowModal(true);
   };
-
-  // Sample proposals data
-  const hires = [
-    {
-      id: 1,
-      freelancer: "Alex Johnson",
-      bid: "$45/hr",
-      coverLetter:
-        "I have extensive experience building e-commerce platforms with React...",
-      submitted: "2 days ago",
-    },
-    {
-      id: 2,
-      freelancer: "Sarah Williams",
-      bid: "$40/hr",
-      coverLetter:
-        "I've worked on similar projects and can deliver high-quality code...",
-      submitted: "3 days ago",
-    },
-  ];
-
-  // const date = jobs?.createdAt
-  // console.log(date)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">{jobs?.title}</h1>
-        <p className="text-gray-500 mt-1">Posted {jobs?.createdAt
-    ? formatDistanceToNow(new Date(jobs.createdAt), { addSuffix: true })
-    : "Unknown"}</p>
+        <p className="text-gray-500 mt-1">
+          Posted{" "}
+          {jobs?.createdAt
+            ? formatDistanceToNow(new Date(jobs.createdAt), { addSuffix: true })
+            : "Unknown"}
+        </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -253,7 +273,7 @@ export const JobDetail = () => {
               </h2>
 
               <div className="space-y-4">
-                {freelancers.map((freelancer) => (
+                {/* {isFreelancer.map((freelancer) => (
                   <div
                     key={freelancer.id}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -261,7 +281,7 @@ export const JobDetail = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-medium text-lg">
-                          {freelancer.name}
+                          {freelancer.fullname}
                         </h3>
                         <div className="flex items-center mt-1 text-sm text-gray-500">
                           <span className="flex items-center">
@@ -303,7 +323,7 @@ export const JobDetail = () => {
                       </button>
                     </div>
                   </div>
-                ))}
+                ))} */}
               </div>
             </div>
           )}
@@ -315,7 +335,9 @@ export const JobDetail = () => {
               </h2>
 
               <div className="space-y-4">
-                {jobs?.proposals.map((proposal) => (
+                {jobs?.proposals.length === 0
+                  ? "No Proposal Submitted Yet!"
+                  : jobs?.proposals.map((proposal) => (
                   <div
                     key={proposal.id}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -326,8 +348,11 @@ export const JobDetail = () => {
                       </h3>
                       <span className="text-sm text-gray-500">
                         {proposal.submittedOn
-    ? formatDistanceToNow(new Date(proposal.submittedOn), { addSuffix: true })
-    : "Unknown"}
+                          ? formatDistanceToNow(
+                              new Date(proposal.submittedOn),
+                              { addSuffix: true }
+                            )
+                          : "Unknown"}
                       </span>
                     </div>
 
@@ -344,18 +369,34 @@ export const JobDetail = () => {
                     </div>
 
                     <div className="mt-4 flex justify-end space-x-4">
-                      <button onClick={() => handleViewModal(proposal)} className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                      <button
+                        onClick={() => handleViewModal(proposal)}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      >
                         View Details
                       </button>
 
-                      <button className=" bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors">
-                        Hire
+                      <button
+                      disabled={jobs?.hired?.some(hiredF=> hiredF.freelancer === proposal?.freelancer)}
+                        onClick={() => hireFreelancer(proposal?.freelancer)}
+                        className=" bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                      >
+                        {jobs?.hired?.some(
+                          (hiredF) => hiredF.freelancer === proposal?.freelancer
+                        )
+                          ? "Hired"
+                          : "Hire"}
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-              {showModal && <ViewProposal jobdata={selectedJob} onClose={() => setShowModal(false)} />}
+              {showModal && (
+                <ViewProposal
+                  proposalData={selectedJob}
+                  onClose={() => setShowModal(false)}
+                />
+              )}
             </div>
           )}
 
@@ -366,44 +407,55 @@ export const JobDetail = () => {
               </h2>
 
               <div className="space-y-4">
-                {hires.map((hire) => (
-                  <div
-                    key={hire.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-medium text-lg">{hire.freelancer}</h3>
-                      <span className="text-sm text-gray-500">
-                        {hire.submitted}
-                      </span>
-                    </div>
+                {jobs?.hired.length === 0
+                  ? "No Freelancer Hired Yet!"
+                  : jobs?.hired.map((hire) => (
+                      <div
+                        key={hire.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium text-lg">
+                            {hire.freelancer}
+                          </h3>
+                          <span className="text-sm text-gray-500">
+                            {/* {(hire.hiredOn)} */}
+                            {hire.hiredOn
+                          ? formatDistanceToNow(
+                              new Date(hire.hiredOn),
+                              { addSuffix: true }
+                            )
+                          : "Unknown"}
+                          </span>
+                          button remove hired frelancer
+                        </div>
 
-                    <div className="mt-2">
-                      <span className="font-bold text-gray-900">
-                        {hire.bid}
-                      </span>
-                    </div>
+                        <div className="mt-2">
+                          <span className="font-bold text-gray-900">
+                            {hire.bidAmount}
+                          </span>
+                        </div>
 
-                    <div className="mt-3">
-                      <p className="text-gray-700 line-clamp-3">
-                        {hire.coverLetter}
-                      </p>
-                    </div>
+                        <div className="mt-3">
+                          <p className="text-gray-700 line-clamp-3">
+                            {hire.coverLetter}
+                          </p>
+                        </div>
 
-                    <div className="mt-4 flex justify-end space-x-4">
-                      <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                        View Details
-                      </button>
-                      {/* <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">Review</button> */}
-                      <button className=" border border-blue-600 hover:bg-blue-50 text-blue-600 px-3 py-1 rounded-md text-sm transition-colors">
-                        Review
-                      </button>
-                      <button className=" bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors">
-                        Message
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                        <div className="mt-4 flex justify-end space-x-4">
+                          <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                            View Details
+                          </button>
+                          {/* <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">Review</button> */}
+                          <button className=" border border-blue-600 hover:bg-blue-50 text-blue-600 px-3 py-1 rounded-md text-sm transition-colors">
+                            Review
+                          </button>
+                          <button className=" bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors">
+                            Message
+                          </button>
+                        </div>
+                      </div>
+                    ))}
               </div>
             </div>
           )}

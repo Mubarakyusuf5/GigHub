@@ -308,7 +308,7 @@ const JobCard = ({ job, onSave, onView }) => {
       </div>
 
       <div className="flex items-center gap-2 mt-2">
-        <span className="text-sm sm:text-base text-gray-700">{job.client  || "default"}</span>
+        <span className="text-sm sm:text-base text-gray-700">{job.client.fullname  || "default"}</span>
         <div className="flex items-center">
           <StarIcon className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-yellow-400" />
           <span className="text-xs sm:text-sm text-gray-600 ml-1">{job.clientRating || "4.3"}</span>

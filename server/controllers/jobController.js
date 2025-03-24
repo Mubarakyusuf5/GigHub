@@ -43,7 +43,9 @@ exports.createJob = async (req, res) => {
 // Get all jobs (Public)
 exports.displayJobs = async (req, res) => {
   try {
-    const jobs = await Job.find()//.populate("client", "name")
+    const jobs = await Job.find().populate({ path: "client" }) // Fetch name and email
+    .populate({ path: "hired.freelancer" }) // Fetch name and profile picture
+    .populate({ path: "proposals.freelancer"});
     res.status(200).json(jobs);
   } catch (error) {
     res
@@ -55,7 +57,9 @@ exports.displayJobs = async (req, res) => {
 // Get all jobs for client each (private)
 exports.displayJobsClient = async (req, res) => {
   try {
-    const jobs = await Job.find()//.populate("client", "name")
+    const jobs = await Job.find().populate({ path: "client" }) // Fetch name and email
+    .populate({ path: "hired.freelancer" }) // Fetch name and profile picture
+    .populate({ path: "proposals.freelancer"});
     res.status(200).json(jobs);
   } catch (error) {
     res
@@ -67,7 +71,9 @@ exports.displayJobsClient = async (req, res) => {
 // Get a single job by ID (Public)
 exports.displayJobById = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id)
+    const job = await Job.findById(req.params.id).populate({ path: "client" }) // Fetch name and email
+    .populate({ path: "hired.freelancer" }) // Fetch name and profile picture
+    .populate({ path: "proposals.freelancer"});
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });

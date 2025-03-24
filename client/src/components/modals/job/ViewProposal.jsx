@@ -76,8 +76,8 @@ export const ViewProposal = ({ onClose, proposalData }) => {
                 <UserCircleIcon className="h-7 w-7 text-blue-600" />
               </div>
               <div className="ml-3">
-                <h2 className="text-lg font-semibold text-gray-900">{"proposals.freelancer"}</h2>
-                <p className="text-sm text-gray-500">{"proposals.freelancer"}</p>
+                <h2 className="text-lg font-semibold text-gray-900">{proposalData.freelancer}</h2>
+                <p className="text-sm text-gray-500">{"freelancer.title"}</p>
                 <button className="mt-1 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
                   <UserIcon className="h-4 w-4 mr-1" />
                   View Profile

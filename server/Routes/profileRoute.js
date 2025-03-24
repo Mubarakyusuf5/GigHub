@@ -16,16 +16,16 @@ const {
 
 // router.get("/hasDetail", VerifyToken, authorizeRoles("Admin","Vendor"),hasDetail);
 // Freelancer routes
-router.post("/createFrlncrKYC", createFreelancer);
-router.get("/displayFrlncrKYC/:id", displayFreelancer);
-router.put("/updateFrlncrKYC/:id", updateFreelancer);
-router.delete("/deleteFrlncrKYC/:id", deleteFreelancer);
+router.post("/createFrlncrProfile", createFreelancer);
+router.get("/displayFrlncrProfile/:id", displayFreelancer);
+router.put("/updateFrlncrProfile/:id", updateFreelancer);
+router.delete("/deleteFrlncrProfile/:id", deleteFreelancer);
 
 // Client routes
-router.post("/createClientsKYC", createClient);
-router.get("/displayClientsKYC/:id", getClient);
-router.put("/updateClientsKYC/:id", updateClient);
-router.delete("/deleteClientsKYC/:id", deleteClient);
+router.post("/createClientProfile", createClient);
+router.get("/displayClientProfile/:id", getClient);
+router.put("/updateClientProfile/:id", updateClient);
+router.delete("/deleteClientProfile/:id", deleteClient);
 
 module.exports = router;
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const FreelancerSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -38,7 +38,7 @@ const Freelancer = mongoose.model("FreelancerProfile", FreelancerSchema);
 
 const ClientSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

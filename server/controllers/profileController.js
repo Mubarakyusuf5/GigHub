@@ -4,7 +4,7 @@ const { Freelancer, Client } = require("../models/KYC");
 // Create a new freelancer profile (Only one per user)
 const createFreelancer = async (req, res) => {
   try {
-    const existingFreelancer = await Freelancer.findOne({ userId: req.body.userId });
+    const existingFreelancer = await Freelancer.findOne({ user: req.user.id });
     if (existingFreelancer) {
       return res.status(400).json({ message: "Profile already exists" });
     }
@@ -19,7 +19,7 @@ const createFreelancer = async (req, res) => {
 // Get a freelancer by ID
 const displayFreelancer = async (req, res) => {
   try {
-    const freelancer = await Freelancer.findById(req.params.id);
+    const freelancer = await Freelancer.findById(req.params.id).populate({path: "User"});
     if (!freelancer) {
       return res.status(404).json({ message: "Freelancer not found" });
     }
@@ -62,7 +62,7 @@ const deleteFreelancer = async (req, res) => {
 // Create a new client profile (Only one per user)
 const createClient = async (req, res) => {
   try {
-    const existingClient = await Client.findOne({ userId: req.body.userId });
+    const existingClient = await Client.findOne({ user: req.user.id });
     if (existingClient) {
       return res.status(400).json({ message: "Profile already exists" });
     }
@@ -77,7 +77,7 @@ const createClient = async (req, res) => {
 // Get a client by ID
 const getClient = async (req, res) => {
   try {
-    const client = await Client.findById(req.params.id);
+    const client = await Client.findById(req.params.id).populate({path: "user"});
     if (!client) {
       return res.status(404).json({ message: "Client not found" });
     }

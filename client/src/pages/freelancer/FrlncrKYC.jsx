@@ -8,6 +8,7 @@ import {
   LinkIcon,
   ShieldCheckIcon,
   XMarkIcon,
+  BanknotesIcon,
 } from "@heroicons/react/24/outline";
 import { States } from "../../components/Data";
 
@@ -22,12 +23,13 @@ export const FrlncrKYC = () => {
     bankName: "",
     accountName: "",
     accountNumber: "",
-    paymentMethod: "",
     portfolio: "",
     github: "",
     linkedin: "",
   });
   const [newSkill, setNewSkill] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [preview, setPreview] = useState("");
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
@@ -37,11 +39,6 @@ export const FrlncrKYC = () => {
     }
   };
 
-  const handleSelectChange = (name, value) => {
-    if (name) {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
 
   const addSkill = () => {
     if (newSkill && !formData.skills.includes(newSkill)) {
@@ -71,7 +68,6 @@ export const FrlncrKYC = () => {
       bankName: "",
       accountName: "",
       accountNumber: "",
-      paymentMethod: "",
       portfolio: "",
       github: "",
       linkedin: "",
@@ -92,6 +88,11 @@ export const FrlncrKYC = () => {
     },
     {
       id: 4,
+      name: "Bank Details",
+      icon: <BanknotesIcon className="h-5 w-5" />,
+    },
+    {
+      id: 5,
       name: "Verification",
       icon: <ShieldCheckIcon className="h-5 w-5" />,
     },
@@ -175,7 +176,8 @@ export const FrlncrKYC = () => {
               {step === 1 && "Tell us about yourself and your expertise"}
               {step === 2 && "Let clients know skills you're expert in"}
               {step === 3 && "Share your work and professional profiles"}
-              {step === 4 && "Review your information before finalizing"}
+              {step === 4 && "Provide your bank detail for seamless payment"}
+              {step === 5 && "Review your information before finalizing"}
             </p>
           </div>
           <div className="px-6 py-6">
@@ -225,7 +227,8 @@ export const FrlncrKYC = () => {
                   </label>
                   <select
                     id="state"
-                    value={formData.state || ""}
+                    name="state"
+                    value={formData.state}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
@@ -248,6 +251,7 @@ export const FrlncrKYC = () => {
                     Experience Level
                   </label>
                   <select
+                  name="experienceLevel"
                     id="experienceLevel"
                     value={formData.experienceLevel || ""}
                     onChange={handleChange}
@@ -402,16 +406,16 @@ export const FrlncrKYC = () => {
 
                 <div>
                   <label
-                    htmlFor="accntName"
+                    htmlFor="accountName"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Account Name
                   </label>
                   <input
-                    id="accntName"
-                    name="accntName"
+                    id="accountName"
+                    name="accountName"
                     type="text"
-                    value={formData.accntName}
+                    value={formData.accountName}
                     onChange={handleChange}
                     placeholder="E.x. John Doe"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -420,16 +424,16 @@ export const FrlncrKYC = () => {
 
                 <div>
                   <label
-                    htmlFor="accntNumber"
+                    htmlFor="accountNumber"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Account Number
                   </label>
                   <input
-                    id="accntNumber"
-                    name="accntNumber"
+                    id="accountNumber"
+                    name="accountNumber"
                     type="number"
-                    value={formData.accntNumber}
+                    value={formData.accountNumber}
                     onChange={handleChange}
                     placeholder="E.x. 1234567890"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -469,7 +473,7 @@ export const FrlncrKYC = () => {
                       </p>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <h4 className="text-sm font-medium text-gray-500">
                         Availability
                       </h4>
@@ -483,15 +487,15 @@ export const FrlncrKYC = () => {
                             }[formData.availability]
                           : "Not provided"}
                       </p>
-                    </div>
+                    </div> */}
 
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">
                         Account Name
                       </h4>
                       <p className="mt-1">
-                        {formData.accntName
-                          ? `${formData.accntName}`
+                        {formData.accountName
+                          ? `${formData.accountName}`
                           : "Not provided"}
                       </p>
                     </div>
@@ -501,8 +505,8 @@ export const FrlncrKYC = () => {
                         Account Number
                       </h4>
                       <p className="mt-1">
-                        {formData.accntNumber
-                          ? `${formData.accntNumber}`
+                        {formData.accountNumber
+                          ? `${formData.accountNumber}`
                           : "Not provided"}
                       </p>
                     </div>
@@ -625,7 +629,7 @@ export const FrlncrKYC = () => {
               <div></div>
             )}
 
-            {step < 4 ? (
+            {step < 5 ? (
               <button
                 onClick={handleNext}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

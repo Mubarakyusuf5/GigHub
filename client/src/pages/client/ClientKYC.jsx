@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -9,8 +9,12 @@ import {
   ShieldCheckIcon,
   XMarkIcon,
   BanknotesIcon,
+  PhotoIcon,
+  CameraIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { States } from "../../components/Data";
+import toast from "react-hot-toast";
 
 export const ClientKYC = () => {
   const [step, setStep] = useState(1);
@@ -25,8 +29,11 @@ export const ClientKYC = () => {
     bankName: "",
     accountName: "",
     accountNumber: "",
+    profilePicture: "",
   });
-  const [newSkill, setNewSkill] = useState("");
+  const fileInputRef = useRef(null);
+  // const [profilePicture, setProfilePicture] = useState(null);
+  const [preview, setPreview] = useState("");
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
@@ -36,47 +43,110 @@ export const ClientKYC = () => {
     }
   };
 
-  const handleSelectChange = (name, value) => {
-    if (name) {
-      setFormData({ ...formData, [name]: value });
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, profilePicture: file });
+      setPreview(URL.createObjectURL(file));
+      }
+  };
+
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
-  const handleFinish = () => {
-    // In a real app, you would navigate to the dashboard
-    // For this example, we'll just reset the form
-    alert("Profile setup complete! Redirecting to dashboard...");
-    setStep(1);
-    setFormData({
-      buisnessType: "",
-      companyName: "",
-      industry: "",
-      email: "",
-      phoneNumber: "",
-      website: "",
-      state: "",
-      bankName: "",
-      accountName: "",
-      accountNumber: "",
-    });
+  const removeProfilePicture = () => {
+    setFormData({ ...formData, profilePicture: "" });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+    try {
+      const { accountName, accountNumber, bankName, companyName, industry, phoneNumber, email, state, buisnessType, profilePicture}= formData
+
+      if(!accountName || !accountNumber || !bankName){
+        toast.error("All bank details must be provided")
+      }
+
+      if(!companyName || !industry || !buisnessType ){
+        toast.error("All buisness / company details must be provided")
+      }
+
+      if(!state ){
+        toast.error("Location must be provided")
+      }
+      if(!email || !phoneNumber){
+        toast.error("All contact details must be provided")
+      }
+      if(!profilePicture){
+        toast.error("Profile picture must be provided")
+      }
+      
+      const response = await axios.post("/api/profile/createClientProfile", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(response.data.message || "Profile created successfully")
+
+      console.log(formData);
+      setStep(1);
+      setFormData({
+        buisnessType: "",
+        companyName: "",
+        industry: "",
+        email: "",
+        phoneNumber: "",
+        website: "",
+        state: "",
+        bankName: "",
+        accountName: "",
+        accountNumber: "",
+      });
+    } catch (error) {
+      
+    }
+
+
   };
 
   const steps = [
-    { id: 1, name: "Basic Information", icon: <UserIcon className="h-5 w-5" /> },
+    {
+      id: 1,
+      name: "Basic Information",
+      icon: <UserIcon className="h-5 w-5" />,
+    },
     {
       id: 2,
       name: "Contact Details",
-      icon: <BriefcaseIcon className="h-5 w-5" />,
+      icon: <EnvelopeIcon className="h-5 w-5" />,
     },
     {
       id: 3,
       name: "Bank Details",
       icon: <BanknotesIcon className="h-5 w-5" />,
     },
+    // {
+    //   id: 4,
+    //   name: "Verification",
+    //   icon: <ShieldCheckIcon className="h-5 w-5" />,
+    // },
     {
       id: 4,
-      name: "Verification",
-      icon: <ShieldCheckIcon className="h-5 w-5" />,
+      name: "Profile Picture",
+      icon: <CameraIcon className="h-5 w-5" />,
     },
   ];
 
@@ -93,7 +163,7 @@ export const ClientKYC = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-12">
+        <div className="mb-10">
           <div className="flex items-center justify-between mb-2">
             {steps.map((s) => (
               <div
@@ -155,10 +225,11 @@ export const ClientKYC = () => {
               Step {step}: {steps.find((s) => s.id === step)?.name}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              {step === 1 && "Tell us about yourself and your expertise"}
-              {step === 2 && "Let clients know skills you're expert in"}
-              {step === 3 && "Share your work and professional profiles"}
-              {step === 4 && "Review your information before finalizing"}
+              {step === 1 && "Tell us about yourself and your basic details"}
+              {step === 2 &&
+                "Provide your contact information and communication preferences"}
+              {step === 3 && "Enter your banking information for payments"}
+              {step === 4 && "Verify your identity and review all information"}
             </p>
           </div>
           <div className="px-6 py-6">
@@ -173,6 +244,7 @@ export const ClientKYC = () => {
                   </label>
                   <select
                     id="buisnessType"
+                    name="buisnessType"
                     value={formData.buisnessType || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -213,6 +285,7 @@ export const ClientKYC = () => {
                   </label>
                   <select
                     id="state"
+                    name="state"
                     value={formData.state || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -237,6 +310,7 @@ export const ClientKYC = () => {
                   </label>
                   <select
                     id="industry"
+                    name="industry"
                     value={formData.industry || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -300,7 +374,7 @@ export const ClientKYC = () => {
                   </label>
                   <input
                     id="website"
-                    type="number"
+                    type="text"
                     name="website"
                     value={formData.website}
                     onChange={handleChange}
@@ -310,61 +384,6 @@ export const ClientKYC = () => {
                 </div>
               </div>
             )}
-
-            {/* {step === 3 && (
-              <div className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="portfolio"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Portfolio Website
-                  </label>
-                  <input
-                    id="portfolio"
-                    name="portfolio"
-                    value={formData.portfolio}
-                    onChange={handleChange}
-                    placeholder="https://yourportfolio.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="github"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    GitHub Profile
-                  </label>
-                  <input
-                    id="github"
-                    name="github"
-                    value={formData.github}
-                    onChange={handleChange}
-                    placeholder="https://github.com/yourusername"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="linkedin"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    LinkedIn Profile
-                  </label>
-                  <input
-                    id="linkedin"
-                    name="linkedin"
-                    value={formData.linkedin}
-                    onChange={handleChange}
-                    placeholder="https://linkedin.com/in/yourusername"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-            )} */}
 
             {step === 3 && (
               <div className="space-y-6">
@@ -378,6 +397,7 @@ export const ClientKYC = () => {
                   </label>
                   <select
                     id="bankName"
+                    name="bankName"
                     value={formData.bankName || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -432,18 +452,101 @@ export const ClientKYC = () => {
 
             {step === 4 && (
               <div className="space-y-6">
+                <div className="flex flex-col items-center">
+                  <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
+                    Profile Picture
+                  </label>
+
+                  <div className="mb-6">
+                    {formData.profilePicture ? (
+                      <div className="relative">
+                        <img
+                          src={preview || "/placeholder.svg"}
+                          alt="Profile Preview"
+                          className="w-40 h-40 rounded-full object-cover border-4 border-gray-200"
+                        />
+                        <button
+                          onClick={removeProfilePicture}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
+                          aria-label="Remove profile picture"
+                        >
+                          <XMarkIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-40 h-40 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-300">
+                        <PhotoIcon className="h-20 w-20 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleProfilePictureChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={triggerFileInput}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <CameraIcon className="h-5 w-5 mr-2" />
+                    {formData.profilePicture
+                      ? "Change Picture"
+                      : "Upload Picture"}
+                  </button>
+
+                  <p className="mt-4 text-sm text-gray-500 text-center max-w-md">
+                    Upload a professional photo to make your profile stand out.
+                    A high-quality headshot with good lighting on a neutral
+                    background works best.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-blue-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-blue-700">
+                        Profiles with professional photos receive up to 14 times
+                        more views and are more likely to be hired.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {step === 5 && (
+              <div className="space-y-6">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Profile Summary
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                    {/* <div>
                       <h4 className="text-sm font-medium text-gray-500">
                         Professional Title
                       </h4>
                       <p className="mt-1">{formData.title || "Not provided"}</p>
-                    </div>
+                    </div> */}
 
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">
@@ -461,7 +564,7 @@ export const ClientKYC = () => {
                       </p>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <h4 className="text-sm font-medium text-gray-500">
                         Availability
                       </h4>
@@ -475,7 +578,7 @@ export const ClientKYC = () => {
                             }[formData.availability]
                           : "Not provided"}
                       </p>
-                    </div>
+                    </div> */}
 
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">
@@ -627,8 +730,9 @@ export const ClientKYC = () => {
               </button>
             ) : (
               <button
-                onClick={handleFinish}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={handleSubmit}
+ async e              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 
+ e.preventDefault()hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Complete Profile
                 <CheckIcon className="h-4 w-4 ml-2" />

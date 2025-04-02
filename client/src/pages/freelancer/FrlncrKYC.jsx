@@ -61,9 +61,11 @@ export const FrlncrKYC = ({
     if (!bankName || !accountNumber ) {
       toast.error("Please fill in all bank details.");
       return false;
-    }else if (accountDetail.account_name){
+    }else if (accountDetail.account_name && 
+      accountDetail.account_number === accountNumber && 
+      accountDetail.bank_code === bankCode){
       setStep(step + 1);
-      return
+      return true
     }
     // console.log(bankCode, " ", accountNumber)
     await verifyAccount(accountNumber, bankCode);

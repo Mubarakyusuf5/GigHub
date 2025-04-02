@@ -36,7 +36,7 @@ export const CompleteProfile = () => {
       // setAccountDetail(response.data)
       // toast.success(response.data?.status === true && "Account verified successfully")
       // toast.error(response.data?.status === false && response.data?.message)
-      console.log("Response Data:", response.data);
+      // console.log("Response Data:", response.data);
     } catch (error) {
       console.error("verifyAccount", error);
       // if (error.response) {

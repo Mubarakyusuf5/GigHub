@@ -9,13 +9,13 @@ const authorizeRoles = require("../middlewares/RoleMiddleware.js");
 const router = express.Router();
 
 router.put("/updateUser/:id", 
-  // VerifyToken, authorizeRoles("Admin"), 
+  VerifyToken, authorizeRoles("Admin", "Client", "Freelancer"), 
   updateUser);
 router.delete("/deleteUser/:id", 
-  // VerifyToken, authorizeRoles("Admin"), 
+  VerifyToken, authorizeRoles("Admin", "Client", "Freelancer"), 
   deleteUser);
 router.get("/displayUser", 
-  // VerifyToken, authorizeRoles("Admin", "Organizer"), 
+  VerifyToken, authorizeRoles("Admin", "Client", "Freelancer"), 
   displayUser);
 
 module.exports = router;

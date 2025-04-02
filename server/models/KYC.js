@@ -27,7 +27,7 @@ const FreelancerSchema = new mongoose.Schema(
       accountNumber: { type: String, required: true },
     },
     profilePicture: { type: String, required: true }, // Cloud storage URL
-    hasProfile: { type: Boolean, default: false },
+    // hasProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -46,7 +46,7 @@ const ClientSchema = new mongoose.Schema(
     companyName: { type: String },
     email: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
-    businessType: {
+    buisnessType: {
       type: String,
       enum: ["Individual", "Company"],
       required: true,
@@ -59,8 +59,8 @@ const ClientSchema = new mongoose.Schema(
       accountName: { type: String, required: true },
       accountNumber: { type: String, required: true },
     },
-    profilePicture: { type: String, required: true }, // Cloud storage URL
-    hasProfile: { type: Boolean, default: false },
+    profilePicture: { type: String, default:"/placeholder.svg" }, // Cloud storage URL
+    // hasProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,

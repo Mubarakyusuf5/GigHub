@@ -34,6 +34,7 @@ const UserSchema = mongoose.Schema(
       enum: ["Active", "Suspended", "Blocked"],
       default: "Active",
     },
+    hasProfile: { type: Boolean, default: false },
   },
   {
     timestamps: true,

@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import toast from 'react-hot-toast';
+import { ClipLoader } from 'react-spinners';
 
 export const Register = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false) 
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -36,6 +38,7 @@ export const Register = () => {
     if (password !== cPassword) {
       return toast.error("Password don't match")
     }
+    setLoading(true)
     try {
       const response = await axios.post("/auth/register", formData);
       // console.log(response)
@@ -43,9 +46,12 @@ export const Register = () => {
       navigate("/login")    
       toast.success(message || "Login successful");
     } catch (error) {
+      console.log(error)
       toast.error(error.response?.data?.message);
       // setLoading(false); // Stop loading regardless of success or error
-    } 
+    } finally {
+      setLoading(false)
+    }
 
   };
 
@@ -157,9 +163,14 @@ export const Register = () => {
             {/* Submit Button */}
             <button
               type="submit"
+              disabled={loading}
               className="bg-[#eea47fff] w-full py-2.5 rounded-md text-white font-semibold hover:bg-[#00539cff] transition-colors duration-300 "
             >
-              Register
+              {loading ? (
+            <ClipLoader color="#ffffff" size={24} /> // Add ClipLoader when loading
+          ) : (
+            "Register"
+          )}
             </button>
             <button
               type="button"

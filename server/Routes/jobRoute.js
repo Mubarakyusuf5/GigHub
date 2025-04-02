@@ -11,14 +11,32 @@ const {
 } = require("../controllers/jobController");
 
 const router = express.Router();
+const { VerifyToken } = require("../middlewares/jwt.js");
+const authorizeRoles = require("../middlewares/RoleMiddleware.js");
 
-router.get("/displayJobs", displayJobs);
-router.get("/displayJobsClient", displayJobsClient);
-router.get("/displayJobById/:id", displayJobById);
-router.post("/createJobs", createJob);
-router.put("/updateJob/:id", updateJob);
-router.delete("/deletejob/:id", deleteJob);
-router.post("/hireFreelancer/:id", hireFreelancer);
-router.post("/submitProposal/:id", submitProposal);
+router.get("/displayJobs", 
+  VerifyToken, authorizeRoles("Client", "Freelancer"), 
+  displayJobs);
+router.get("/displayJobsClient", 
+  VerifyToken, authorizeRoles("Client", "Freelancer"), 
+  displayJobsClient);
+router.get("/displayJobById/:id", 
+  VerifyToken, authorizeRoles("Client", "Freelancer"), 
+  displayJobById);
+router.post("/createJobs", 
+  VerifyToken, authorizeRoles("Client"), 
+  createJob);
+router.put("/updateJob/:id", 
+  VerifyToken, authorizeRoles("Client"), 
+  updateJob);
+router.delete("/deletejob/:id", 
+  VerifyToken, authorizeRoles("Client"), 
+  deleteJob);
+router.post("/hireFreelancer/:id", 
+  VerifyToken, authorizeRoles("Client"), 
+  hireFreelancer);
+router.post("/submitProposal/:id", 
+  VerifyToken, authorizeRoles("Client", "Freelancer"), 
+  submitProposal);
 
 module.exports = router;

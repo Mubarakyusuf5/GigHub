@@ -6,6 +6,7 @@ const {
   } = require("../middlewares/hash.js");
 // const vendorDetailModel = require("../models/vendorDetailModel.js");
 const bcrypt = require("bcryptjs");
+const { Freelancer, Client } = require("../models/KYC.js");
 
 const displayUser = async (req, res)=>{
     try {
@@ -16,10 +17,9 @@ const displayUser = async (req, res)=>{
     }
 }
 
-
 const updateUser = async (req, res) => {
   try {
-    const { fullname, role, email, password, status } = req.body;
+    const { fullname, role, email, status } = req.body;
     const userId = req.params.id;
 
     // Validate input data
@@ -84,13 +84,22 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res)=>{
     try {
-      // const deletedVendorDetail = await VendorDetail.findOneAndDelete({ userId: req.params.id });
-        const deletedUser = await Users.findByIdAndDelete(req.params.id)
-        if (!deletedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
+      const user = await Users.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if(user.role === "Freelancer"){
+        await Freelancer.findOneAndDelete({ user: req.params.id });
+      }else if(user.role === "Client"){
+        await Client.findOneAndDelete({ user: req.params.id });
+      }
+      
+      await Users.findByIdAndDelete(req.params.id)
+
           res.status(200).json({message: "User deleted successfully"})
         } catch (error) {
+          console.log(error)
         res.status(500).json({message: "Error deleting User", error})
     }
 }

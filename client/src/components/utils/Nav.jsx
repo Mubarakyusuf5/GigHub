@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Bars3Icon,
@@ -8,161 +8,227 @@ import {
   GlobeAltIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { useAuth } from "../../Context/AuthContext";
+import { DropdownMenu } from "./dropdownNav";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { NotificationModal } from "../modals/NotificationModal";
 
 export const Nav = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const user = "Client";
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isNotitfy, setNotitfy] = useState(false);
+  const [profile, setProfile] = useState("");
+  const mobileMenuRef = useRef(null);
+  const notifyMenuRef = useRef(null);
+  const { user } = useAuth();
 
-  ""
+  const fetchProfile = async () => {
+    try {
+      if (user?.role === "Client") {
+        const response = await axios.get(`/api/profile/displayClientProfile`);
+        setProfile(response.data.client[0]);
+      } else if (user?.role === "Freelancer") {
+        const response = await axios.get(`/api/profile/displayFrlncrProfile`);
+        // console.log(response.data.freelancer[0])
+        setProfile(response.data.freelancer[0]);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Error displaying profile!");
+    }
+  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
-  const toggleMenu = ()=>{
-    setIsOpen(isOpen => !isOpen)
-    console.log(isOpen ? "close" : "open")
-  }
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (
+          mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)
+        ) {
+          setIsMobile(false);
+        } 
+        // if(notifyMenuRef.current && !notifyMenuRef.current.contains(e.target)){
+        //   setNotitfy(false)
+        // }
+      };
+  
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
 
-  const mobileMenu =()=>{
+  const toggleMenu = () => {
+    setIsOpen((isOpen) => !isOpen);
+  };
 
-  }
+  const mobileMenu = () => {
+    setIsMobile(prevMobile => !prevMobile)
+  };
+
+  const notifyMenu = () => {
+    setNotitfy(prevNotify => !prevNotify)
+  };
   return (
-    <nav className={`bg-white shadow-sm sticky top-0 z-10 ${user === "Admin" ? "hidden" : ""}`}>
+    <nav
+      className={`bg-white shadow-sm sticky top-0 z-10 ${
+        user?.role === "Admin" ? "hidden" : ""
+      }`}
+    >
       <div className="px-4 lg:px-10">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link
-            to={user === "Client" ? `/client/dashboard` : `/dashboard`}
-            className="flex items-center space-x-2"
-          >
-            <img
-              src="/placeholder.svg?height=40&width=40"
-              width={40}
-              height={40}
-              alt="GigHub Logo"
-            />
-            <span className="text-xl font-bold text-[#3A506B]">GigHub</span>
-          </Link>
+          <div className="flex space-x-11">
+            <div className="flex items-center gap-3">
+              <div onClick={mobileMenu} className="lg:hidden">
+                <Bars3Icon className="h-8 w-8 cursor-pointer " />
+              </div>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-4">
-            {user === "Client" ? (
-              <>
-                <Link to="/" className="text-[#3A506B] hover:text-[#FF6B6B]">
-                  Home
-                </Link>
-                <div className="relative group">
-                  <button className="text-[#3A506B] hover:text-[#FF6B6B] flex items-center">
-                    client Categories{" "}
-                    <ChevronDownIcon className="ml-1 h-4 w-4" />
-                  </button>
-                  <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out">
-                    {/* <div className="py-1">
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Design
-                      </Link>
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Development
-                      </Link>
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Writing
-                      </Link>
-                    </div> */}
-                  </div>
-                </div>
-                <Link
-                  to="/analytics"
-                  className="text-[#3A506B] hover:text-[#FF6B6B]"
-                >
-                  Analytics
-                </Link>
-                <Link
-                  to="/message"
-                  className="text-[#3A506B] hover:text-[#FF6B6B]"
-                >
-                  Messages
-                  {/* <BellIcon className="ml-1 h-4 w-4" /> */}
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/" className="text-[#3A506B] hover:text-[#FF6B6B]">
-                  Home
-                </Link>
-                <div className="relative group">
-                  <button className="text-[#3A506B] hover:text-[#FF6B6B] flex items-center">
-                    Browse Categories{" "}
-                    <ChevronDownIcon className="ml-1 h-4 w-4" />
-                  </button>
-                  <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out">
-                    <div className="py-1">
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Design
-                      </Link>
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Development
-                      </Link>
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-[#3A506B] hover:bg-[#F0F3F5]"
-                      >
-                        Writing
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <Link
-                  to="/analytics"
-                  className="text-[#3A506B] hover:text-[#FF6B6B]"
-                >
-                  Analytics
-                </Link>
-                <Link
-                  to="/message"
-                  className="text-[#3A506B] hover:text-[#FF6B6B]"
-                >
-                  Messages
-                </Link>
-              </>
-            )}
-          </div>
+              {/* Logo */}
+              <Link
+                to={
+                  user?.role === "Client" ? `/client/dashboard` : `/dashboard`
+                }
+                className="flex items-center space-x-2"
+              >
+                <img
+                  src="/placeholder.svg"
+                  width={40}
+                  height={40}
+                  alt="GigHub Logo"
+                />
+                <span className="text-xl font-bold text-[#3A506B]">GigHub</span>
+              </Link>
+            </div>
 
-          {/* Search Bar */}
-          <div className="hidden lg:block">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for freelancers or services..."
-                className="w-64 pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF6B6B] focus:border-transparent"
-              />
-              <MagnifyingGlassIcon className="absolute h-5 w-5 left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center space-x-4">
+              {user?.role === "Client" ? (
+                <>
+                  <Link
+                    to="/client/find-freelancers"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Find Freelancers
+                  </Link>
+                  <Link
+                    to="/analytics"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Analytics
+                  </Link>
+                  <Link
+                    to="/message"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Messages
+                    {/* <BellIcon className="ml-1 h-4 w-4" /> */}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/find-jobs"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Find Jobs
+                  </Link>
+                  <Link
+                    to="/analytics"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Analytics
+                  </Link>
+                  <Link
+                    to="/message"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Messages
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
           {/* CTA Buttons and Auth Links */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <BellIcon className={` h-7 w-7 cursor-pointer ${isOpen ? "text-red-500" : ""} `} />
-            <div onClick={toggleMenu} className="h-12 w-12 rounded-full object-cover bg-gray-300 cursor-pointer">
-              <img src="/placeholder.svg?height=40&width=40" alt="" className="h-full w-full rounded-full" />
+          <div className="flex items-center space-x-4">
+            <div>
+            <BellIcon onClick={notifyMenu} className={` h-7 w-7 cursor-pointer `} />
+
+            <NotificationModal isNotify={isNotitfy} notifyMenuRef={notifyMenuRef} />
+            </div>
+            <div
+              onClick={toggleMenu}
+              className="h-12 w-12 rounded-full bg-gray-300 cursor-pointer overflow-hidden"
+            >
+              <img
+                loading="lazy"
+                src={`${import.meta.env.VITE_BACKEND_URL}/${
+                  profile?.profilePicture
+                }`}
+                alt={profile?.profilePictur}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            {/* dropdown menu */}
+            <div>
+              <DropdownMenu
+                isOpen={isOpen}
+                profile={profile}
+                
+              />
             </div>
           </div>
-          <div className="lg:hidden">
-            <Bars3Icon className="h-8 w-8 cursor-pointer " />
-          </div>
         </div>
+      </div>
+
+      {/* mobile menu */}
+      <div ref={mobileMenuRef} className={`bg-red-400 w-[250px] lg:hidden h-[100vh] p-2 transition-all duration-300 absolute ${isMobile ? "left-0" : "-left-[250px]"} overflow-hidden flex flex-col`}>
+      {user?.role === "Client" ? (
+                <>
+                  <Link
+                    to="/client/find-freelancers"
+                    className="text-[#3A506B] hover:bg-teal-100"
+                  >
+                    Find Freelancers
+                  </Link>
+                  <Link
+                    to="/analytics"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Analytics
+                  </Link>
+                  <Link
+                    to="/message"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Messages
+                    {/* <BellIcon className="ml-1 h-4 w-4" /> */}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/find-jobs"
+                    className="text-[#3A506B] hover:bg-teal-100 p-2 bg-white rounded-md"
+                  >
+                    Find Jobs
+                  </Link>
+                  <Link
+                    to="/analytics"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Analytics
+                  </Link>
+                  <Link
+                    to="/message"
+                    className="text-[#3A506B] hover:text-[#FF6B6B]"
+                  >
+                    Messages
+                  </Link>
+                </>
+              )}
       </div>
     </nav>
   );

@@ -94,13 +94,13 @@ const deleteClient = async (req, res) => {
   }
 };
 
-module.exports = {
-  upload, // Export multer middleware
-  createClient,
-  getClient,
-  updateClient,
-  deleteClient,
-};
+// module.exports = {
+//   upload, // Export multer middleware
+//   createClient,
+//   getClient,
+//   updateClient,
+//   deleteClient,
+// };
 
 
 // const express = require("express");

@@ -179,7 +179,6 @@ export const UpdateJobModal = ({ onClose, fetchJobs, jobData}) => {
       ...formData,
       requirements: formData.requirements.filter((req) => req.trim() !== ""),
     }
-console.log(cleanedFormData)
     try {
       const response = await axios.put(`/api/job/updateJob/${jobData._id}`, cleanedFormData)
       toast.success(response.data?.message || "Job posted successfully!")
@@ -473,7 +472,7 @@ console.log(cleanedFormData)
               type="submit"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Post Job
+              Save
             </button>
           </div>
         </form>

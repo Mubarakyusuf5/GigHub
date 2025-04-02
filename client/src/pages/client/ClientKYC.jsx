@@ -15,6 +15,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { States } from "../../components/Data";
 import toast from "react-hot-toast";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const ClientKYC = () => {
   const [step, setStep] = useState(1);
@@ -32,8 +34,8 @@ export const ClientKYC = () => {
     profilePicture: "",
   });
   const fileInputRef = useRef(null);
-  // const [profilePicture, setProfilePicture] = useState(null);
   const [preview, setPreview] = useState("");
+  const navigate = useNavigate()
 
   const handleNext = () => setStep(step + 1);
   const handleBack = () => setStep(step - 1);
@@ -92,15 +94,15 @@ export const ClientKYC = () => {
       if(!email || !phoneNumber){
         toast.error("All contact details must be provided")
       }
-      if(!profilePicture){
-        toast.error("Profile picture must be provided")
-      }
-      
-      const response = await axios.post("/api/profile/createClientProfile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      toast.success(response.data.message || "Profile created successfully")
+      // if(!profilePicture){
+      //   toast.error("Profile picture must be provided")
+      // }
 
+      console.log(formData)
+      
+      const response = await axios.post("/api/profile/createClientProfile", formData);
+      toast.success(response.data.message || "Profile created successfully")
+      navigate("/client/dashboard")
       console.log(formData);
       setStep(1);
       setFormData({
@@ -114,9 +116,10 @@ export const ClientKYC = () => {
         bankName: "",
         accountName: "",
         accountNumber: "",
+        profilePicture: "",
       });
     } catch (error) {
-      
+      toast.error(error.response?.data?.message || "Error creating profile, please try again...")
     }
 
 
@@ -155,10 +158,10 @@ export const ClientKYC = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Complete Your Client Profile
+            Client Information Form
           </h1>
           <p className="mt-3 text-xl text-gray-500">
-            Let's set up your profile to help you find the perfect projects
+          Please provide the necessary information to set up your client account
           </p>
         </div>
 
@@ -225,11 +228,12 @@ export const ClientKYC = () => {
               Step {step}: {steps.find((s) => s.id === step)?.name}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              {step === 1 && "Tell us about yourself and your basic details"}
+              {step === 1 && "Tell us about your company and business details"}
               {step === 2 &&
                 "Provide your contact information and communication preferences"}
-              {step === 3 && "Enter your banking information for payments"}
-              {step === 4 && "Verify your identity and review all information"}
+              {step === 3 && "Add your banking information in case of disputes"}
+              {step === 4 && "Upload a professional profile picture or company logo"}
+              {/* {step === 5 && "Review all information before submitting"} */}
             </p>
           </div>
           <div className="px-6 py-6">
@@ -252,8 +256,8 @@ export const ClientKYC = () => {
                     <option value="" disabled>
                       Select your Buisness Type
                     </option>
-                    <option value="Entry">Individual</option>
-                    <option value="Expert">Company</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
                     {/* <option value="senior">Senior (10+ years)</option> */}
                   </select>
                 </div>
@@ -318,7 +322,7 @@ export const ClientKYC = () => {
                     <option value="" disabled>
                       Select your experience level
                     </option>
-                    <option value="Entry">Dev & IT</option>
+                    <option value="Dev & IT">Dev & IT</option>
                     <option value="Intermediate">
                       Intermediate (2-5 years)
                     </option>
@@ -405,7 +409,7 @@ export const ClientKYC = () => {
                     <option value="" disabled>
                       Select your Bank Name
                     </option>
-                    <option value="full-time">UBA</option>
+                    <option value="UBA">UBA</option>
                     <option value="part-time">FCMB</option>
                     <option value="limited">OPAY</option>
                     <option value="occasional">KUDA</option>
@@ -500,7 +504,7 @@ export const ClientKYC = () => {
                   </button>
 
                   <p className="mt-4 text-sm text-gray-500 text-center max-w-md">
-                    Upload a professional photo to make your profile stand out.
+                    Upload a professional photo or company logo to make your profile stand out.
                     A high-quality headshot with good lighting on a neutral
                     background works best.
                   </p>
@@ -720,7 +724,7 @@ export const ClientKYC = () => {
               <div></div>
             )}
 
-            {step < 4 ? (
+            {step < 3 ? (
               <button
                 onClick={handleNext}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -731,8 +735,7 @@ export const ClientKYC = () => {
             ) : (
               <button
                 onClick={handleSubmit}
- async e              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 
- e.preventDefault()hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Complete Profile
                 <CheckIcon className="h-4 w-4 ml-2" />

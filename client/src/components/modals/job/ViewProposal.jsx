@@ -14,34 +14,7 @@ import {
 
 export const ViewProposal = ({ onClose, proposalData }) => {
     
-// const [selectedUser, setSelectedUser] = useState(null)
-  // Sample proposals data - in a real app, this would be passed as props
-//   const [proposals] = useState({
-//     freelancer: {
-//       name: "John Doe",
-//       title: "Senior Web Developer",
-//       avatar: null, // Could be a URL to the avatar image
-//     },
-//     coverLetter:
-//       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi, doloremque? Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, quisquam.",
-//     duration: "2 weeks",
-//     bidAmount: 500,
-//     payment: "Milestone", // Can be "On completion" or "Milestone",
-//     milestone: [
-//       {
-//         description: "Initial wireframes and design concepts",
-//         amount: 150,
-//       },
-//       {
-//         description: "Frontend development and responsive implementation",
-//         amount: 200,
-//       },
-//       {
-//         description: "Backend integration and final delivery",
-//         amount: 150,
-//       },
-//     ],
-//   })
+
 
   // Calculate total milestone amount
 //   const totalMilestoneAmount = proposals.milestone.reduce((total, m) => total + m.amount, 0)
@@ -76,7 +49,7 @@ export const ViewProposal = ({ onClose, proposalData }) => {
                 <UserCircleIcon className="h-7 w-7 text-blue-600" />
               </div>
               <div className="ml-3">
-                <h2 className="text-lg font-semibold text-gray-900">{proposalData.freelancer}</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{proposalData.freelancer.fullname}</h2>
                 <p className="text-sm text-gray-500">{"freelancer.title"}</p>
                 <button className="mt-1 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
                   <UserIcon className="h-4 w-4 mr-1" />

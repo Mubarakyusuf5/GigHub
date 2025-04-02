@@ -136,7 +136,7 @@ const displayVendorDetailById = async (req, res) => {
   }
 };
 
-const hasDetail = async (req, res) => {
+const hasProfile = async (req, res) => {
   try {
     // Ensure the user is authenticated and has a valid ID
     const userId = req.user?.id;
@@ -150,26 +150,21 @@ const hasDetail = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Check if the role has business details
-    if (user.role === "Client") {
-      const clientDetail = await FrnclrKYC.findOne({ userId });
+    // Check if the role has profile = true
+    
+      const userDetail = await User.findOne({ userId });
       
       res.status(200).json({
-        message: "Vendor detail status fetched successfully",
-        kycVerified: clientDetail?.kycVerified || false,  // True if details exist, false otherwise
+        status: "success",
+        // message: "User status fetched successfully",
+        hasProfile: userDetail?.hasProfile // True if details exist, false otherwise
       });
-    } else {
-      const FrnclrDetail = await FrnclrKYC.findOne({ userId });
-      res.status(200).json({
-        message: "Vendor detail status fetched successfully",
-        kycVerified: FrnclrDetail?.kycVerified || false,  // True if details exist, false otherwise
-      });
-    }
+    
 
     // Return a boolean indicating whether business details exist
   } catch (error) {
     console.error("Error in hasDetail function:", error);
-    res.status(500).json({ message: "Internal server error." });
+    res.status(500).json({ message: "Internal server error during profile verification." });
   }
 };
 

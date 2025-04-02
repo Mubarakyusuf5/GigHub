@@ -5,69 +5,19 @@ import axios from "axios"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
+import { useAuth } from "../../Context/AuthContext"
 
 
 export const FreeDash = () => {
   // Sample job data - would come from API in real implementation
-  const [jobs, setJobs] = useState([
-    // {
-    //   id: 1,
-    //   title: "Senior React Developer for E-commerce Platform",
-    //   client: "TechSolutions Inc.",
-    //   clientRating: 4.8,
-    //   budget: "$30-50/hr",
-    //   description:
-    //     "We are looking for an experienced React developer to help build our e-commerce platform. The ideal candidate should have experience with React, Redux, and modern JavaScript practices.",
-    //   skills: ["React", "Redux", "JavaScript", "TypeScript", "CSS"],
-    //   postedDate: "2 days ago",
-    //   proposals: 12,
-    //   saved: false,
-    // },
-    // {
-    //   id: 2,
-    //   title: "Full Stack Developer for SaaS Application",
-    //   client: "InnovateX",
-    //   clientRating: 4.9,
-    //   budget: "$40-60/hr",
-    //   description:
-    //     "Looking for a talented full-stack developer to join our team and help build a new SaaS application. You'll be working with Node.js, React, and MongoDB.",
-    //   skills: ["Node.js", "React", "MongoDB", "Express", "AWS"],
-    //   postedDate: "5 hours ago",
-    //   proposals: 5,
-    //   saved: true,
-    // },
-    // {
-    //   id: 3,
-    //   title: "UI/UX Designer for Mobile App",
-    //   client: "AppWorks Studio",
-    //   clientRating: 4.7,
-    //   budget: "$35-45/hr",
-    //   description:
-    //     "We need a creative UI/UX designer to help design our new mobile application. Experience with Figma and mobile design patterns is required.",
-    //   skills: ["UI/UX Design", "Figma", "Mobile Design", "Prototyping"],
-    //   postedDate: "1 day ago",
-    //   proposals: 8,
-    //   saved: false,
-    // },
-    // {
-    //   id: 4,
-    //   title: "WordPress Developer for Corporate Website",
-    //   client: "Global Enterprises",
-    //   clientRating: 4.5,
-    //   budget: "$25-35/hr",
-    //   description:
-    //     "Seeking a WordPress developer to redesign our corporate website. Experience with custom themes and plugins is necessary.",
-    //   skills: ["WordPress", "PHP", "JavaScript", "HTML", "CSS"],
-    //   postedDate: "3 days ago",
-    //   proposals: 15,
-    //   saved: false,
-    // },
-  ])
-
+  const [jobs, setJobs] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
+  const [profile, setProfile] = useState("")
   const [filteredJobs, setFilteredJobs] = useState(jobs)
   const [activeFilter, setActiveFilter] = useState("all")
   const navigate = useNavigate();
+  const {user} = useAuth()
+  // console.log(user)
 
   const fetchJobs = async ()=>{
     try {
@@ -108,12 +58,25 @@ export const FreeDash = () => {
     setFilteredJobs(results)
   }, [searchTerm, jobs])
 
-
-
   // Toggle save job
   const toggleSaveJob = (id) => {
     setJobs(jobs.map((job) => (job?._id === id ? { ...job, saved: !job.saved } : job)))
   }
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`/api/profile/displayFrlncrProfile`)
+      // console.log(response.data.freelancer[0])
+      setProfile(response.data.freelancer[0])
+      
+    } catch (error) {
+      console.log("freeDash", error)
+      toast.error(error.response?.data?.message || "Error displaying profile!")
+    }
+  }
+
+  useEffect(() => {
+    fetchProfile()
+  }, [])
 
   const handleNavigate = (job) => {
     navigate(`/job-detail/${job._id}`, { state: { job } })
@@ -212,12 +175,12 @@ export const FreeDash = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
               <div className="p-4 sm:p-6 border-b border-gray-100">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg sm:text-xl">
-                    JD
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg sm:text-xl overflow-hidden">
+                    <img src={`${import.meta.env.VITE_BACKEND_URL}/${profile?.profilePicture}`} loading="lazy" alt={profile?.profilePicture} className="h-full w-full object-cover" />
                   </div>
                   <div>
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900">Freelancer name</h2>
-                    <p className="text-sm sm:text-base text-gray-500">Senior Full Stack Developer</p>
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900">{profile?.user?.fullname}</h2>
+                    <p className="text-sm sm:text-base text-gray-500">{profile?.title} </p>
                   </div>
                 </div>
 

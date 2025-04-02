@@ -179,7 +179,6 @@ export const PostJobModal = ({ onClose, fetchJobs }) => {
       ...formData,
       requirements: formData.requirements.filter((req) => req.trim() !== ""),
     }
-console.log(cleanedFormData)
     try {
       const response = await axios.post("/api/job/createJobs", cleanedFormData)
       toast.success(response.data?.message || "Job posted successfully!")

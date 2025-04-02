@@ -1,17 +1,4 @@
-// chatgpt
 const mongoose = require("mongoose");
-
-// const [formData, setFormData] = useState({
-//       title
-//       budget
-//       duration
-//       experienceLevel
-//       proposalsToReview
-//       hires
-//       description
-//       requirements
-//       skills
-//     });
 
 const jobSchema = new mongoose.Schema(
   {
@@ -76,7 +63,8 @@ const jobSchema = new mongoose.Schema(
         },
         hiredOn: {
           type: Date,
-          required: true
+          required: true,
+          default: Date.now,
         }
       },
     ],
@@ -99,8 +87,8 @@ const jobSchema = new mongoose.Schema(
           },
           submittedOn: {
             type: Date,
-            required: true
-            // default: Date.now,
+            required: true,
+            default: Date.now
           },
           coverLetter: {
             type: String,
@@ -111,6 +99,10 @@ const jobSchema = new mongoose.Schema(
             required: true,
           },
           bidAmount: {
+            type: String,
+            required: true,
+          },
+          platformFee: {
             type: String,
             required: true,
           },
@@ -148,11 +140,10 @@ const jobSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    //deadline is based on the shortest duration from freelancer proposal pending on the job
-    // completedOn: {
-    //   type: Date,
-    //   default: null,
-    // },
+    platformFee: {
+    type: String,
+    required: true
+   }
   },
   {
     timestamps: true,

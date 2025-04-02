@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
-// import { useAuth } from "../../Context/AuthContext"
+import { useAuth } from "../../Context/AuthContext"
 import { ClipLoader } from "react-spinners" // Import ClipLoader
 
 export const Login = () => {
@@ -11,7 +11,7 @@ export const Login = () => {
     password: "",
   })
   const navigate = useNavigate()
-  // const { login, user } = useAuth()
+  const { login, user } = useAuth()
   const [User, setUser] = useState(null)
   const [loading, setLoading] = useState(false) // Add loading state
 
@@ -32,8 +32,7 @@ export const Login = () => {
 
     try {
       const response = await axios.post("/auth/login", formData)
-      // console.log(response.data)
-      // login(response.data?.user) // Update the user context
+      login(response.data?.user) // Update the user context
 
       const { role } = response.data?.user // Access role inside user object
       const message = response.data.message
@@ -44,6 +43,7 @@ export const Login = () => {
       toast.success(message || "Login successful")
     } catch (error) {
       toast.error(error.response?.data?.message || "Internal server error")
+      console.log("Login error:", error)
     } finally {
       setLoading(false) // Stop loading regardless of success or error
     }
@@ -56,43 +56,42 @@ export const Login = () => {
   }
 
   const redirectUser = async (role) => {
-    // if (role === "Client" || role === "Freelancer") {
-    //   try {
-    //     // Fetch kyc details
-    //     const response = await axios.get("/api/vendor/hasDetail");
+    if (role === "Client" || role === "Freelancer") {
+      try {
+        // Fetch kyc details Wrong new logic fetch from user model to check if hasProfile = true
+        const response = await axios.get("/api/profile/hasProfile");
   
-    //     // Check if the role has KYC details
-    //     const kycVerified = response.data?.kycVerified;
-    //     // console.log(kycVerified)
+        // Check if the role has KYC details
+        const hasProfile = response.data?.hasProfile;
   
-    //     // Redirect based on whether the role has business details
-    //     if (kycVerified && role === "Client") {
-    //       navigate("/client/dashboard"); // Redirect to client dashboard
-    //     } else if kycVerified && role === "Freelancer") {
-    //       navigate("/dashboard"); // Redirect to freelancer dashboard
-    //     } else {
-    //       navigate("/complete-profile"); // Redirect to create business details page
-    //     }
-    //   } catch (error) {
-    //     console.error(`Error fetching ${role} details:`, error.message);
-    //     toast.error(`Error checking ${role} details.`);
-    //     navigate("/"); // Fallback in case of error
-    //   }
-    // } else {
-    //   // Redirect non-vendor users based on their role
-    //   navigate(roleRoutes[role] || "/");
-    // }
+        // Redirect based on whether the role has business details
+        if (hasProfile === true && role === "Client") {
+          navigate("/client/dashboard"); // Redirect to client dashboard
+        } else if (hasProfile === true && role === "Freelancer") {
+          navigate("/dashboard"); // Redirect to freelancer dashboard
+        } else {
+          navigate("/complete-profile"); // Redirect to create business details page
+        }
+      } catch (error) {
+        console.error(`Error fetching ${role} details:`, error.message);
+        toast.error( error.response?.data?.message || `Error checking ${role} details.`);
+        navigate("/"); // Fallback in case of error
+      }
+    } else {
+      // Redirect profile users based on their role
+      navigate(roleRoutes[role] || "/");
+    }
     // if (user) {
-      navigate(roleRoutes[role] || "/")
+      // navigate(roleRoutes[role] || "/")
     // }
   }
 
-  // useEffect(() => {
-  //   if (user) {
-  //     // Redirect if user is already logged in
-  //     redirectUser(user?.role)
-  //   }
-  // }, [user, navigate, redirectUser]) // Added redirectUser to dependencies
+  useEffect(() => {
+    if (user) {
+      // Redirect if user is already logged in
+      redirectUser(user?.role)
+    }
+  }, [user, navigate, redirectUser]) // Added redirectUser to dependencies
 
   return (
     <div className="flex justify-center p-4 lg:p-0 min-h-screen font-poppins items-center bg-white text-black">

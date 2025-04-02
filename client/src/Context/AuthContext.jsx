@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem("user", JSON.stringify(data.user));
         }
       } catch (error) {
-        // toast.error(error?.data?.message)
-        // console.error("Error fetching user", error);
+        toast.error(error.response?.data?.message)
+        console.error("Error fetching user", error);
       }
     };
     fetchUser();
@@ -44,9 +44,9 @@ export const AuthProvider = ({ children }) => {
       toast.success(response.data.message || "Logged out successfully");
       setUser(null);
       localStorage.removeItem("user");
-      navigate('/');
+      navigate('/login');
     } catch (error) {
-      toast.error("Error during logout. Please try again.");
+      toast.error(error.response?.data?.message ||"Error during logout. Please try again.");
       console.error("Error during logout:", error);
     }
   };

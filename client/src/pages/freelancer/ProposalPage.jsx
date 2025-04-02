@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   CalendarIcon,
@@ -14,17 +14,23 @@ import {
 import axios from "axios";
 import { formatNaira } from "../../components/Data";
 import { ClipLoader } from "react-spinners";
+import { useAuth } from "../../Context/AuthContext";
 
 export const ProposalPage = () => {
+  const {user} = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proposal, setProposal] = useState({
-    freelancer: "67d73b2bf8a52c65cdb359fc",
+    // freelancer: user?.id,
     coverLetter: "",
     bidAmount: "",
     duration: "",
     payment: "",
     // attachments: [],
   });
+    // Default 5% fee
+    const [feePercentage, setFeePercentage] = useState(5)
+    const [platformFee, setPlatformFee] = useState(0)
+  const navigate = useNavigate()
   const { id } = useParams();
 
   // This would be replaced with your actual data fetching logic
@@ -50,13 +56,12 @@ export const ProposalPage = () => {
       ...prev,
       [name]: value,
     }));
-  };
 
-  const handleFileChange = (e) => {
-    setProposal((prev) => ({
-      ...prev,
-      attachments: Array.from(e.target.files),
-    }));
+        // Calculate fee when bid amount changes
+        if (name === "bidAmount" && value) {
+          const calculatedFee = (Number.parseFloat(value) * feePercentage) / 100
+          setPlatformFee(calculatedFee)
+        }
   };
 
   const handleSubmit = async (e) => {
@@ -65,17 +70,15 @@ export const ProposalPage = () => {
 
     try {
       const { duration, payment, bidAmount, coverLetter} = proposal
-      // This would be your actual API call to submit the proposal
-      // await fetch(`/api/proposals/submit/${id}`, {
-      //   method: 'POST',
-      //   body: JSON.stringify(proposal)
-      // })
+
       if(!duration || !payment || !bidAmount || !coverLetter){
         return toast.error("All field must be filled")
       }
-      const response = await axios.post(`/api/job/submitProposal/${id}`, proposal)
+      console.log(proposal)
+      const response = await axios.post(`/api/job/submitProposal/${id}`, {...proposal, freelancer: user?.id, platformFee});
+      console.log(response)
       toast.success( response.data.message || "Proposal submitted successfully");
-
+      navigate(-1)
       // Reset form
       setProposal({
         coverLetter: "",
@@ -86,6 +89,7 @@ export const ProposalPage = () => {
       });
     } catch (error) {
       toast.error( error.response?.data?.message || "Failed to submit your proposal. Please try again.");
+      console.log(error)
     } finally {
       setIsSubmitting(false);
     }
@@ -217,6 +221,16 @@ export const ProposalPage = () => {
                       The client's budget is{" "}
                       {job?.budget ? formatNaira(job.budget) : "not specified"}
                     </p>
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Platform fee ({feePercentage}%):</span>{" "}
+                        {proposal.bidAmount ? formatNaira(platformFee) : "₦0.00"}
+                      </p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        <span className="font-medium">You'll receive:</span>{" "}
+                        {proposal.bidAmount ? formatNaira(Number.parseFloat(proposal.bidAmount) - platformFee) : "₦0.00"}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="space-y-2">

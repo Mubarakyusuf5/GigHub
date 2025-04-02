@@ -71,6 +71,12 @@ export const SkillSelector = () => {
           You selected: {selectedCategory} → {selectedSkill}
         </p>
       )}
+
+      {categor.map(({skills}, index)=> (
+        <ul>
+          <li key={index}>{skills.join(", ")}</li>
+        </ul>
+      ))}
     </div>
   );
 };

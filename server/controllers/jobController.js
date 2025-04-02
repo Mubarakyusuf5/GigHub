@@ -2,6 +2,7 @@ const Job = require("../models/jobPosting");
 
 // Create a new job (Client only)
 exports.createJob = async (req, res) => {
+  const userId = req.user.id
   try {
     const {
       title,
@@ -12,6 +13,7 @@ exports.createJob = async (req, res) => {
       hires,
       category,
       description,
+      platformFee,
       requirements,
       skills,
     } = req.body;
@@ -19,13 +21,14 @@ exports.createJob = async (req, res) => {
 
 
     const newJob = await Job.create({
-      client: "67b4c474bffa981502693743", // Authenticated client
+      client: userId, // Authenticated client
       title,
       budget,
       duration,
       experienceLevel,
       proposalsToReview,
       hires,
+      platformFee,
       category,
       description,
       requirements,
@@ -57,7 +60,7 @@ exports.displayJobs = async (req, res) => {
 // Get all jobs for client each (private)
 exports.displayJobsClient = async (req, res) => {
   try {
-    const jobs = await Job.find().populate({ path: "client" }) // Fetch name and email
+    const jobs = await Job.find({client: req.user.id}).populate({ path: "client" }) // Fetch name and email
     .populate({ path: "hired.freelancer" }) // Fetch name and profile picture
     .populate({ path: "proposals.freelancer"});
     res.status(200).json(jobs);
@@ -144,25 +147,53 @@ exports.hireFreelancer = async (req, res) => {
     }
 
     // Use $addToSet to prevent duplicates and ensure atomic update
-    const updatedJob = await Job.findByIdAndUpdate(
+    const hiredJob = await Job.findByIdAndUpdate(
       req.params.id,
-      { $push: { hired: {freelancer, hiredOn: new Date()} } }, 
+      { $push: { hired: {freelancer} } }, 
       { new: true }
     );
 
-    res.status(200).json({ message: "Freelancer hired successfully", job: updatedJob });
+    res.status(200).json({ message: "Freelancer hired successfully", job: hiredJob });
   } catch (error) {
     res.status(500).json({ message: "Error hiring freelancer", error});
     console.log(error)
   }
 };
 
-exports.removeHiredFreelancer = async (req, res) => {}
+exports.removeHiredFreelancer = async (req, res) => {
+  try {
+    const { freelancer } = req.body;
+// console.log(freelancer)
+    // Validate freelancerId
+    if (!freelancer) {
+      return res.status(400).json({ message: "Freelancer ID is required" });
+    }
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    // Use $addToSet to prevent duplicates and ensure atomic update
+    const unHireJob = await Job.findByIdAndDelete(
+      req.params.id,
+      // refine to delete
+      { $push: { hired: {freelancer} } }, 
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Freelancer unhired successfully", job: unHireJob });
+  } catch (error) {
+    res.status(500).json({ message: "Error unhiring freelancer", error});
+    console.log(error)
+  }
+}
 
 // Submission of proposals (Client only)
 exports.submitProposal = async (req, res) => {
   try {
-    const { freelancer, coverLetter, duration, bidAmount, payment, milestone } = req.body;
+    const { freelancer, coverLetter, duration, platformFee, bidAmount, payment, milestone } = req.body;
 
     if (!freelancer) {
       return res.status(400).json({ message: "Freelancer ID is required" });
@@ -188,8 +219,8 @@ exports.submitProposal = async (req, res) => {
       duration,
       bidAmount,
       payment,
+      platformFee,
       milestone,
-      subnittedOn: new Date()
     };
 
     // Add the new proposal

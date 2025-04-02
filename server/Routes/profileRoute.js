@@ -11,21 +11,49 @@ const {
   getClient,
   updateClient,
   deleteClient,
+  hasProfile,
+  displayFreelancerById,
+  displayClient,
 } = require("../controllers/profileController.js");
+const { upload } = require("../middlewares/multerUpload.js");
 
 
-// router.get("/hasDetail", VerifyToken, authorizeRoles("Admin","Vendor"),hasDetail);
+router.get("/hasProfile", 
+  VerifyToken, authorizeRoles("Freelancer","Client"),
+hasProfile);
 // Freelancer routes
-router.post("/createFrlncrProfile", createFreelancer);
-router.get("/displayFrlncrProfile/:id", displayFreelancer);
-router.put("/updateFrlncrProfile/:id", updateFreelancer);
-router.delete("/deleteFrlncrProfile/:id", deleteFreelancer);
+router.post("/createFrlncrProfile", upload.single("profilePicture"), 
+VerifyToken, authorizeRoles("Admin", "Freelancer"), 
+createFreelancer);
+router.get("/displayFrlncrProfile", 
+  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  displayFreelancer);
+router.get("/displayFrlncrProfileById/:id", 
+  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  displayFreelancerById);
+router.put("/updateFrlncrProfile/:id", 
+  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  updateFreelancer);
+router.delete("/deleteFrlncrProfile/:id", 
+  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  deleteFreelancer);
 
 // Client routes
-router.post("/createClientProfile", createClient);
-router.get("/displayClientProfile/:id", getClient);
-router.put("/updateClientProfile/:id", updateClient);
-router.delete("/deleteClientProfile/:id", deleteClient);
+router.post("/createClientProfile", 
+  VerifyToken, authorizeRoles("Admin", "Client"), 
+  createClient);
+  router.get("/displayClientProfile", 
+    VerifyToken, authorizeRoles("Admin", "Client"),
+    displayClient);
+router.get("/displayClientProfileById/:id", 
+  VerifyToken, authorizeRoles("Admin", "Client"), 
+  getClient);
+router.put("/updateClientProfile/:id", 
+  VerifyToken, authorizeRoles("Admin", "Client"), 
+  updateClient);
+router.delete("/deleteClientProfile/:id", 
+  VerifyToken, authorizeRoles("Admin", "Client"), 
+  deleteClient);
 
 module.exports = router;
 

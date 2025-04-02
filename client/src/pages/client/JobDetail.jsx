@@ -339,12 +339,12 @@ useEffect(()=>{
                   ? "No Proposal Submitted Yet!"
                   : jobs?.proposals.map((proposal) => (
                   <div
-                    key={proposal.id}
+                    key={proposal._id}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-start">
                       <h3 className="font-medium text-lg">
-                        {proposal.freelancer}
+                        {proposal.freelancer.fullname}
                       </h3>
                       <span className="text-sm text-gray-500">
                         {proposal.submittedOn
@@ -382,7 +382,7 @@ useEffect(()=>{
                         className=" bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
                       >
                         {jobs?.hired?.some(
-                          (hiredF) => hiredF.freelancer === proposal?.freelancer
+                          (hiredF) => hiredF?.freelancer._id === proposal?.freelancer._id
                         )
                           ? "Hired"
                           : "Hire"}
@@ -416,7 +416,7 @@ useEffect(()=>{
                       >
                         <div className="flex justify-between items-start">
                           <h3 className="font-medium text-lg">
-                            {hire.freelancer}
+                            {hire.freelancer.fullname}
                           </h3>
                           <span className="text-sm text-gray-500">
                             {/* {(hire.hiredOn)} */}

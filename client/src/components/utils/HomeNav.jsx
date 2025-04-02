@@ -16,7 +16,7 @@ export const HomeNav = () => {
             {/* Navigation Links */}
             <div className="hidden lg:flex items-center space-x-4">
               <Link to="/" className="text-[#3A506B] hover:text-[#FF6B6B]">
-                Home
+                something
               </Link>
               <div className="relative group">
                 <button className="text-[#3A506B] hover:text-[#FF6B6B] flex items-center">
@@ -42,7 +42,7 @@ export const HomeNav = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="hidden lg:block">
+            {/* <div className="hidden lg:block">
               <div className="relative">
                 <input
                   type="text"
@@ -51,7 +51,7 @@ export const HomeNav = () => {
                 />
                 <MagnifyingGlassIcon className="absolute h-5 w-5 left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
-            </div>
+            </div> */}
 
             {/* CTA Buttons and Auth Links */}
             <div className="hidden lg:flex items-center space-x-4">

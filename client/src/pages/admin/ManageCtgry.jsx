@@ -27,7 +27,7 @@ const ActionButton = ({ icon: Icon, onClick, ariaLabel, bgColor }) => (
 const customStyles = {
   headRow: {
     style: {
-      backgroundColor: "#f9fafb",
+      backgroundColor: "#fff",
       color: "#374151",
       borderBottom: "1px solid #e5e7eb",
       borderTopLeftRadius: "0.75rem",
@@ -51,6 +51,7 @@ const customStyles = {
       paddingRight: "16px",
       paddingTop: "12px",
       paddingBottom: "12px",
+      width: "150px"
     },
   },
   rows: {
@@ -116,7 +117,7 @@ export const ManageCtgry = () => {
         const searchTerm = search.toLowerCase()
         return (
           (cat.category && cat.category.toLowerCase().includes(searchTerm)) ||
-          (cat.skills && cat.skills.includes(searchTerm))
+          (cat.skills && cat.skills.includes(searchTerm)) //fix filter
         )
       })
       setFilteredData(filtered)
@@ -156,7 +157,7 @@ export const ManageCtgry = () => {
 
   const columns = [
     {
-      name: "Full Name",
+      name: "Category",
       selector: (row) => row.category,
       sortable: true,
     },
@@ -165,26 +166,6 @@ export const ManageCtgry = () => {
       selector: (row) => row.skills.join(", "),
       sortable: true,
     },
-    // {
-    //   name: "Status",
-    //   selector: (row) => row.status,
-    //   sortable: true,
-    //   cell: (row) => (
-    //     <span
-    //       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-    //         row.status === "Suspended"
-    //           ? "bg-yellow-100 text-yellow-800"
-    //           : row.status === "Active"
-    //             ? "bg-green-100 text-green-800"
-    //             : row.status === "Blocked"
-    //               ? "bg-red-100 text-red-800"
-    //               : "bg-blue-100 text-blue-800"
-    //       }`}
-    //     >
-    //       {row.status}
-    //     </span>
-    //   ),
-    // },
     {
       name: "Actions",
       cell: (row) => (
@@ -216,17 +197,15 @@ export const ManageCtgry = () => {
   ]
 
   return (
-    <div className="flex min-h-screen bg-gray-50 max-w-[1200px]">
+    <div className="flex min-h-screen bg-gray-50 ">
       <Sidebar />
-      <div className="flex-1 ml-[240px]">
-        <AdminNav />
+      <div className="w-full lg:ml-[240px]">
+        <AdminNav isOpen={isOpen} click={handleToggle} />
         <div className="p-6 lg:p-8">
           {/* Header section */}
           <div className="flex flex-col gap-6 mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <h1 className="text-2xl md:text-3xl font-bold text-[#00539c] font-poppins">Manage Categories</h1>
               
-            </div>
 
              {/* Action Bar */}
              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
@@ -260,24 +239,6 @@ export const ManageCtgry = () => {
                   </button>
                 )}
               </div>
-
-              {/* Filter button */}
-              {/* <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`inline-flex items-center justify-center px-4 py-2.5 border rounded-lg shadow-sm transition-all duration-200 ${
-                  showFilters || statusFilter !== "all" || roleFilter !== "all"
-                    ? "bg-[#00539c] text-white border-[#00539c]"
-                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
-                }`}
-              >
-                <FunnelIcon className="h-5 w-5 mr-2" />
-                <span>Filters</span>
-                {(statusFilter !== "all" || roleFilter !== "all") && (
-                  <span className="ml-2 bg-white text-[#00539c] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {(statusFilter !== "all" ? 1 : 0) + (roleFilter !== "all" ? 1 : 0)}
-                  </span>
-                )}
-              </button> */}
 
               {/* Refresh button */}
               <button

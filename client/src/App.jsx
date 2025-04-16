@@ -22,7 +22,7 @@ import { JobDetail } from "./pages/client/JobDetail";
 // import { SkillSelector } from "./components/modals/job/SkillSelector";
 // import { JobModa } from "./components/modals/job/JobModa";
 import { Transactions } from "./pages/admin/Transactions";
-import { Profile } from "./pages/general/Profile";
+import { Profile1 } from "./pages/general/Profile1";
 import { FrlncrJobDetail } from "./pages/freelancer/FrlncrJobDetail";
 import { ProposalPage } from "./pages/freelancer/ProposalPage";
 import { ViewProposal } from "./components/modals/job/ViewProposal";
@@ -34,6 +34,16 @@ import { AuthProvider, useAuth } from "./Context/AuthContext";
 import { AccountSetting } from "./pages/general/AccountSetting";
 import { Navbars } from "./pages/general/Navbars";
 import { TestDetails } from "./pages/client/TestDetails";
+import { FindFreelancer } from "./pages/client/FindFreelancer";
+import { FindJobs } from "./pages/freelancer/FindJobs";
+// import { FreelancerCard } from "./pages/general/freelancer-profile-view-usage";
+import { FreelancerProfile } from "./pages/freelancer/FreelancerProfile";
+// import { ClientProfile } from "./pages/client/ClientProfile";
+import { ClientProfileView } from "./pages/general/freelancer-profile-view";
+import { ClientCard } from "./pages/general/freelancer-profile-view-usage";
+import HiredFreelancersSection from "./test/usage";
+import { RequestPayment } from "./pages/admin/RequestPayment";
+import { ScrollToTop } from "./components/ScrollToTop";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 axios.defaults.baseURL = BACKEND_URL;
@@ -51,15 +61,13 @@ export const App = () => {
   const { user } = useAuth()
   return (
     // <AuthProvider>
-      <div>
+      <div className="">
+        <ScrollToTop />
         {/* <HomeNav /> */}
         <Toaster position="top-center" duration={3000} />
+        {/* token expiry modal */}
         {user && <TokenExpiryModal />}
-        {/* {user === "Client" || user === "Freelancer" ?
-      (!isSignInPage && !isSignupPage && !isFrgtPage  && !isOTPPage && !isResetPage && !isKYCPage && <Nav />) :
-      user === "Admin" ? (<p className='hidden'>admin</p>)
-      :
-      (!isSignInPage && !isSignupPage && !isFrgtPage  && !isOTPPage && !isResetPage && !isKYCPage && <HomeNav />)} */}
+        
         {!isSignInPage &&
           !isSignupPage &&
           !isFrgtPage &&
@@ -79,7 +87,9 @@ export const App = () => {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/complete-profile" element={<CompleteProfile />} />
           <Route path="/viewProposal" element={<ViewProposal />} />
-          <Route path="/account-settings" element={<AccountSetting />} />
+          {/* <Route path="/account-settings" element={<AccountSetting />} /> */}
+          <Route path="/account-settings/:tab" element={<AccountSetting />} />
+          {/* <Route path="/account-settings/profile" element={<AccountSetting />} /> */}
           <Route path="/preview" element={<Preview />} />
           <Route path="/navs" element={<Navbars />} />
           <Route path="/detail" element={<TestDetails />} />
@@ -89,16 +99,25 @@ export const App = () => {
           <Route path="/admin/manage-users" element={<ManageUser />} />
           <Route path="/admin/manage-categories" element={<ManageCtgry />} />
           <Route path="/admin/transactions" element={<Transactions />} />
+          <Route path="/admin/payment-request" element={<RequestPayment />} />
 
           {/* Client */}
           <Route path="/client/dashboard" element={<ClientDash />} />
           <Route path="/client/job-details/:id" element={<JobDetail />} />
+          <Route path="/client/find-freelancers" element={<FindFreelancer />} />
+          <Route path="/profileClient" element={<ClientCard />} />
 
           {/* Freelancer */}
           <Route path="/dashboard" element={<FreeDash />} />
           <Route path="/job-detail/:id" element={<FrlncrJobDetail />} />
           <Route path="/proposal/:id" element={<ProposalPage />} />
-          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/find-jobs" element={<FindJobs />} />
+          <Route path="/profile" element={<Profile1 />} />
+          <Route path="/profileFree/:id" element={<FreelancerProfile />} />
+          {/* <Route path="/profil" element={<FreelancerCard />} /> */}
+
+          {/* testing purpose */}
+          <Route path="/hire" element={<HiredFreelancersSection />} />
 
           <Route
             path="/unauthorized"

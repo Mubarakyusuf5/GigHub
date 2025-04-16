@@ -13,12 +13,17 @@ import {
   CameraIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
-import { States } from "../../components/Data";
+import { Industries, States } from "../../components/Data";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export const ClientKYC = () => {
+export const ClientKYC = ({
+  loading,
+  verifyAccount,
+  bankDetails,
+  accountDetail,
+}) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     buisnessType: "",
@@ -33,11 +38,32 @@ export const ClientKYC = () => {
     accountNumber: "",
     profilePicture: "",
   });
+  const [bankCode, setbankCode] = useState("");
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleNext = () => setStep(step + 1);
+  const validateStep3 = async () => {
+    const { bankName, accountNumber } = formData;
+    if (!bankName || !accountNumber) {
+      toast.error("Please fill in all bank details.");
+      return false;
+    } else if (
+      accountDetail.account_name &&
+      accountDetail.account_number === accountNumber &&
+      accountDetail.bank_code === bankCode
+    ) {
+      setStep(step + 1);
+      return true;
+    }
+    // console.log(bankCode, " ", accountNumber)
+    await verifyAccount(accountNumber, bankCode);
+  };
+
+  const handleNext = async () => {
+    if (step === 3 && !(await validateStep3())) return;
+    setStep(step + 1);
+  };
   const handleBack = () => setStep(step - 1);
   const handleChange = (e) => {
     if (e && e.target && e.target.name) {
@@ -50,7 +76,7 @@ export const ClientKYC = () => {
     if (file) {
       setFormData({ ...formData, profilePicture: file });
       setPreview(URL.createObjectURL(file));
-      }
+    }
   };
 
   // Cleanup preview URL when component unmounts
@@ -75,34 +101,47 @@ export const ClientKYC = () => {
     }
   };
 
-  const handleSubmit = async(e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const { accountName, accountNumber, bankName, companyName, industry, phoneNumber, email, state, buisnessType, profilePicture}= formData
-
-      if(!accountName || !accountNumber || !bankName){
-        toast.error("All bank details must be provided")
+      const {
+        accountNumber,
+        bankName,
+        companyName,
+        industry,
+        phoneNumber,
+        email,
+        state,
+        buisnessType,
+        profilePicture,
+      } = formData;
+// client might need profile pictue for company like logo
+      if (!accountNumber || !bankName) {
+        toast.error("All bank details must be provided");
       }
 
-      if(!companyName || !industry || !buisnessType ){
-        toast.error("All buisness / company details must be provided")
+      if (!companyName || !industry || !buisnessType) {
+        toast.error("All buisness / company details must be provided");
       }
 
-      if(!state ){
-        toast.error("Location must be provided")
+      if (!state) {
+        toast.error("Location must be provided");
       }
-      if(!email || !phoneNumber){
-        toast.error("All contact details must be provided")
+      if (!email || !phoneNumber) {
+        toast.error("All contact details must be provided");
       }
       // if(!profilePicture){
       //   toast.error("Profile picture must be provided")
       // }
 
-      console.log(formData)
-      
-      const response = await axios.post("/api/profile/createClientProfile", formData);
-      toast.success(response.data.message || "Profile created successfully")
-      navigate("/client/dashboard")
+      console.log(formData);
+
+      const response = await axios.post(
+        "/api/profile/createClientProfile",
+        {...formData, accountName: accountDetail?.account_name},
+      );
+      toast.success(response.data.message || "Profile created successfully");
+      navigate("/client/dashboard");
       console.log(formData);
       setStep(1);
       setFormData({
@@ -119,10 +158,11 @@ export const ClientKYC = () => {
         profilePicture: "",
       });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error creating profile, please try again...")
+      toast.error(
+        error.response?.data?.message ||
+          "Error creating profile, please try again..."
+      );
     }
-
-
   };
 
   const steps = [
@@ -154,14 +194,15 @@ export const ClientKYC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
             Client Information Form
           </h1>
           <p className="mt-3 text-xl text-gray-500">
-          Please provide the necessary information to set up your client account
+            Please provide the necessary information to set up your client
+            account
           </p>
         </div>
 
@@ -232,7 +273,8 @@ export const ClientKYC = () => {
               {step === 2 &&
                 "Provide your contact information and communication preferences"}
               {step === 3 && "Add your banking information in case of disputes"}
-              {step === 4 && "Upload a professional profile picture or company logo"}
+              {step === 4 &&
+                "Upload a professional profile picture or company logo"}
               {/* {step === 5 && "Review all information before submitting"} */}
             </p>
           </div>
@@ -320,14 +362,11 @@ export const ClientKYC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="" disabled>
-                      Select your experience level
+                      Select your industry
                     </option>
-                    <option value="Dev & IT">Dev & IT</option>
-                    <option value="Intermediate">
-                      Intermediate (2-5 years)
-                    </option>
-                    <option value="Expert">Expert (5-10 years)</option>
-                    {/* <option value="senior">Senior (10+ years)</option> */}
+                    {Industries.map(({industry})=>(
+                    <option key={industry} value={industry}>{industry}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -340,7 +379,7 @@ export const ClientKYC = () => {
                     htmlFor="email"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Email
+                    Business Email
                   </label>
                   <input
                     id="email"
@@ -403,20 +442,55 @@ export const ClientKYC = () => {
                     id="bankName"
                     name="bankName"
                     value={formData.bankName || ""}
-                    onChange={handleChange}
+                    // onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      const selectedBank = bankDetails.find(
+                        (bank) => bank.name === e.target.value
+                      );
+                      if (selectedBank) {
+                        setbankCode(selectedBank.code); // Ensure setBankCode is correctly defined
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="" disabled>
                       Select your Bank Name
                     </option>
-                    <option value="UBA">UBA</option>
-                    <option value="part-time">FCMB</option>
-                    <option value="limited">OPAY</option>
-                    <option value="occasional">KUDA</option>
+                    {bankDetails?.length > 0 ? (
+                      bankDetails.map(({ name, id }) => (
+                        <option key={id} value={name}>
+                          {name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No banks available</option>
+                    )}
                   </select>
                 </div>
 
-                <div>
+                {formData.bankName && (
+                  <div>
+                    <label
+                      htmlFor="accountNumber"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Account Number
+                    </label>
+                    <input
+                      id="accountNumber"
+                      name="accountNumber"
+                      type="number"
+                      maxLength={10}
+                      value={formData.accountNumber}
+                      onChange={handleChange}
+                      placeholder="E.x. 1234567890"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                )}
+
+                {accountDetail?.account_name && <div>
                   <label
                     htmlFor="accountName"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -427,30 +501,13 @@ export const ClientKYC = () => {
                     id="accountName"
                     name="accountName"
                     type="text"
-                    value={formData.accountName}
-                    onChange={handleChange}
+                    value={accountDetail?.account_name || ""}
+                    readOnly
+                    // onChange={handleChange}
                     placeholder="E.x. John Doe"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="accountNumber"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Account Number
-                  </label>
-                  <input
-                    id="accountNumber"
-                    name="accountNumber"
-                    type="number"
-                    value={formData.accountNumber}
-                    onChange={handleChange}
-                    placeholder="E.x. 1234567890"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+                </div>}
               </div>
             )}
 
@@ -504,9 +561,9 @@ export const ClientKYC = () => {
                   </button>
 
                   <p className="mt-4 text-sm text-gray-500 text-center max-w-md">
-                    Upload a professional photo or company logo to make your profile stand out.
-                    A high-quality headshot with good lighting on a neutral
-                    background works best.
+                    Upload a professional photo or company logo to make your
+                    profile stand out. A high-quality headshot with good
+                    lighting on a neutral background works best.
                   </p>
                 </div>
 
@@ -536,180 +593,7 @@ export const ClientKYC = () => {
                 </div>
               </div>
             )}
-            
-            {step === 5 && (
-              <div className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Profile Summary
-                  </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Professional Title
-                      </h4>
-                      <p className="mt-1">{formData.title || "Not provided"}</p>
-                    </div> */}
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Experience Level
-                      </h4>
-                      <p className="mt-1">
-                        {formData.experienceLevel
-                          ? {
-                              entry: "Entry Level (0-2 years)",
-                              intermediate: "Intermediate (2-5 years)",
-                              expert: "Expert (5-10 years)",
-                              senior: "Senior (10+ years)",
-                            }[formData.experienceLevel]
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    {/* <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Availability
-                      </h4>
-                      <p className="mt-1">
-                        {formData.availability
-                          ? {
-                              "full-time": "Full-time (40+ hrs/week)",
-                              "part-time": "Part-time (20-30 hrs/week)",
-                              limited: "Limited (10-20 hrs/week)",
-                              occasional: "Occasional (Less than 10 hrs/week)",
-                            }[formData.availability]
-                          : "Not provided"}
-                      </p>
-                    </div> */}
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Account Name
-                      </h4>
-                      <p className="mt-1">
-                        {formData.accountName
-                          ? `${formData.accountName}`
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Account Number
-                      </h4>
-                      <p className="mt-1">
-                        {formData.accountNumber
-                          ? `${formData.accountNumber}`
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    {/* <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Skills
-                      </h4>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {formData.skills.length > 0 ? (
-                          formData.skills.map((skill, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
-                            >
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          <p>No skills provided</p>
-                        )}
-                      </div>
-                    </div> */}
-
-                    {/* <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">Bio</h4>
-                      <p className="mt-1">{formData.bio || "Not provided"}</p>
-                    </div> */}
-
-                    {/* <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Links
-                      </h4>
-                      <ul className="mt-1 space-y-1">
-                        <li>
-                          {formData.portfolio ? (
-                            <a
-                              href={formData.portfolio}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              Portfolio Website
-                            </a>
-                          ) : (
-                            "No portfolio provided"
-                          )}
-                        </li>
-                        <li>
-                          {formData.github ? (
-                            <a
-                              href={formData.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              GitHub Profile
-                            </a>
-                          ) : (
-                            "No GitHub profile provided"
-                          )}
-                        </li>
-                        <li>
-                          {formData.linkedin ? (
-                            <a
-                              href={formData.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              LinkedIn Profile
-                            </a>
-                          ) : (
-                            "No LinkedIn profile provided"
-                          )}
-                        </li>
-                      </ul>
-                    </div> */}
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="h-5 w-5 text-yellow-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        By completing your profile, you agree to our Terms of
-                        Service and Privacy Policy.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
             {step > 1 ? (
@@ -724,18 +608,19 @@ export const ClientKYC = () => {
               <div></div>
             )}
 
-            {step < 3 ? (
+            {step < 4 ? (
               <button
                 onClick={handleNext}
+                disabled={loading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Next
+                {loading ? "Validating..." : "Next"}
                 <ArrowRightIcon className="h-4 w-4 ml-2" />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Complete Profile
                 <CheckIcon className="h-4 w-4 ml-2" />

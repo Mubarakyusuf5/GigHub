@@ -18,10 +18,9 @@ export const ResetPass = () => {
     },[navigate])
 
     useEffect(()=>{
-      console.log(token)
       const checkToken = async () => {
         try {
-          await axios.get(`/check-token/${token}`);
+          await axios.get(`/auth/check-token/${token}`);
         }
         catch (error) {
           toast.error(error.response?.data?.message);
@@ -47,7 +46,6 @@ export const ResetPass = () => {
       const response = await axios.post(`/auth/resetPassword`, {
         resetToken: token,
         newPassword: password,
-        // newPassword is saved as password in backend
       });
 
       toast.success(response.data.message || "Password reset successfully!");

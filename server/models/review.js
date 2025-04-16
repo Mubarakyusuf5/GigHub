@@ -9,11 +9,11 @@ const mongoose = require("mongoose");
 
 const ReviewSchema = mongoose.Schema(
   {
-    freelancer: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    // freelancer: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "User",
+    //   required: true,
+    // },
     review: [
       {
         client: {

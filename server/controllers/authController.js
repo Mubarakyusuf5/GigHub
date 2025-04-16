@@ -17,6 +17,9 @@ const registerUser = async (req, res) => {
         if (exist) {
             return res.status(400).json({ message: "Email already exists" });
         }
+        if(!fullname, !email, !password, !role){
+            return res.status(400).json({ message: "All fields are required" });
+        }
 
         // Hash the password
         const hashedPassword = await hashPassword(password);
@@ -47,16 +50,16 @@ const registerUser = async (req, res) => {
         const newUser = await Users.create(userData);
 
         // Send welcome email
-        // const login = `${process.env.CLIENT_URL}/login`;
-        // const clientLink = `${process.env.CLIENT_URL}/client/dashboard`;
-        // const freelancerLink = `${process.env.CLIENT_URL}/dashboard`;
+        const login = `${process.env.CLIENT_URL}/login`;
+        const clientLink = `${process.env.CLIENT_URL}/client/dashboard`;
+        const freelancerLink = `${process.env.CLIENT_URL}/dashboard`;
 
-        // const templatePath = path.join(__dirname, "../templates/welcome-template.html");
-        // const source = fs.readFileSync(templatePath, "utf-8");
-        // const template = handlebars.compile(source);
-        // const emailTemplate = template({ fullname, login, clientLink, freelancerLink });
+        const templatePath = path.join(__dirname, "../templates/welcome-template.html");
+        const source = fs.readFileSync(templatePath, "utf-8");
+        const template = handlebars.compile(source);
+        const emailTemplate = template({ fullname, login, clientLink, freelancerLink });
 
-        // await sendEmail(email, "Welcome Email", emailTemplate);
+        await sendEmail(email, "Welcome Email", emailTemplate);
 
         res.status(200).json({
             message: "User registered successfully",
@@ -74,6 +77,10 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if(!email, !password){
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
         const user = await Users.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "User not found" });
@@ -82,14 +89,11 @@ const loginUser = async (req, res) => {
         if(user.role === "Client"){
             const hasProfile = await Client.findOne({ user: user._id })
             if (!hasProfile) {
-                // return res.status(400).json({ message: "Please complete your profile to login" });
                 await Users.findByIdAndUpdate(user._id, { hasProfile: false });
             }
         }else if(user.role === "Freelancer"){
             const hasProfile = await Freelancer.findOne({ user: user._id })
-
             if (!hasProfile) {
-                // return res.status(400).json({ message: "Please complete your profile to login" });
                 await Users.findByIdAndUpdate(user._id, { hasProfile: false });
             }
         }
@@ -121,13 +125,13 @@ const loginUser = async (req, res) => {
             secure: true,
             sameSite: "Strict",
             maxAge: 7 * 24 * 60 * 60 * 1000, 
-            // maxAge: 60 * 1000, 
-        });        
-
+        });   
+        // const newUser = user.id    
+        // console.log(newUser) 
         res.status(200).json({ message: "Login successful", user, accessToken, refreshToken });
     } catch (error) {
         res.status(500).json({ message: error.message });
-        console.log(error);
+        console.log("loginuser", error);
     }
 };
 
@@ -139,7 +143,7 @@ const getUser = (req, res) => {
         res.status(200).json({ user: req.user });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
-        console.log(error);
+        console.log("getUser", error);
     }
 };
 
@@ -150,7 +154,7 @@ const logout = async (req, res) => {
         res.status(200).json({ message: "User logged out successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
-        console.log(error);
+        console.log("logout", error);
     }
 };
 

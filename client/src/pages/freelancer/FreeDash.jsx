@@ -1,41 +1,51 @@
-import { ArrowLongLeftIcon, BookmarkIcon, BriefcaseIcon, CheckCircleIcon, ClockIcon, CurrencyDollarIcon, FunnelIcon, MagnifyingGlassIcon, StarIcon } from "@heroicons/react/24/outline"
-import { useState, useEffect } from "react"
-import { formatNaira } from "../../components/Data"
-import axios from "axios"
-import toast from "react-hot-toast"
-import { useNavigate } from "react-router-dom"
-import { formatDistanceToNow } from "date-fns"
-import { useAuth } from "../../Context/AuthContext"
-
+import {
+  ArrowLongLeftIcon,
+  BookmarkIcon,
+  BriefcaseIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  FunnelIcon,
+  MagnifyingGlassIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
+import { formatNaira } from "../../components/Data";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "../../Context/AuthContext";
+import { JobCardFrlncr } from "../../components/cards/JobCardFrlncr";
 
 export const FreeDash = () => {
   // Sample job data - would come from API in real implementation
-  const [jobs, setJobs] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [profile, setProfile] = useState("")
-  const [filteredJobs, setFilteredJobs] = useState(jobs)
-  const [activeFilter, setActiveFilter] = useState("all")
+  const [jobs, setJobs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [profile, setProfile] = useState("");
+  const [filteredJobs, setFilteredJobs] = useState(jobs);
+  const [activeFilter, setActiveFilter] = useState("recent");
   const navigate = useNavigate();
-  const {user} = useAuth()
+  const { user } = useAuth();
   // console.log(user)
 
-  const fetchJobs = async ()=>{
+  const fetchJobs = async () => {
     try {
-      const response = await axios.get("/api/job/displayJobs")
-      setJobs(response.data)
+      const response = await axios.get("/api/job/displayJobs");
+      setJobs(response.data);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error displaying jobs!")
+      toast.error(error.response?.data?.message || "Error displaying jobs!");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchJobs()
-  }, [])
-  
+    fetchJobs();
+  }, []);
+
   // Filter jobs based on category
   const filterJobs = (filter) => {
     setActiveFilter(filter);
-    
+
     if (filter === "all") {
       setFilteredJobs(jobs);
     } else if (filter === "saved") {
@@ -53,34 +63,38 @@ export const FreeDash = () => {
       (job) =>
         job?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job?.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job?.skills.some((skill) => skill.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-    setFilteredJobs(results)
-  }, [searchTerm, jobs])
+        job?.skills.some((skill) =>
+          skill.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    setFilteredJobs(results);
+  }, [searchTerm, jobs]);
 
   // Toggle save job
   const toggleSaveJob = (id) => {
-    setJobs(jobs.map((job) => (job?._id === id ? { ...job, saved: !job.saved } : job)))
-  }
+    setJobs(
+      jobs.map((job) => (job?._id === id ? { ...job, saved: !job.saved } : job))
+    );
+  };
+
+  // function to fetch profile
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`/api/profile/displayFrlncrProfile`)
+      const response = await axios.get(`/api/profile/displayFrlncrProfile`);
       // console.log(response.data.freelancer[0])
-      setProfile(response.data.freelancer[0])
-      
+      setProfile(response.data.freelancer[0]);
     } catch (error) {
-      console.log("freeDash", error)
-      toast.error(error.response?.data?.message || "Error displaying profile!")
+      console.log("freeDash", error);
+      toast.error(error.response?.data?.message || "Error displaying profile!");
     }
-  }
-
+  };
   useEffect(() => {
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, []);
 
   const handleNavigate = (job) => {
-    navigate(`/job-detail/${job._id}`, { state: { job } })
-  }
+    navigate(`/job-detail/${job._id}`, { state: { job } });
+  };
 
   // Stats for the sidebar
   const stats = {
@@ -88,18 +102,27 @@ export const FreeDash = () => {
     jobsApplied: 24,
     interviews: 8,
     successRate: 75,
-  }
+  };
+
+  const filterTab = [
+    { title: "All jobs", filter: "recent" },
+    // { title: "All jobs", filter: "all" }, //no need always show latest jobs
+    { title: "Saved Jobs", filter: "saved" },
+    { title: "Completed jobs", filter: "completed" },
+  ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+    <div className=" min-h-screen">
+      <div className=" px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main content area - full width on mobile, flex-1 on desktop */}
           <div className="w-full lg:flex-1 order-2 lg:order-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               {/* Search and filters header */}
               <div className="p-4 sm:p-6 border-b border-gray-100">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Find Work</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                  Find Work
+                </h1>
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
@@ -113,36 +136,20 @@ export const FreeDash = () => {
 
                 {/* Filter tabs - scrollable on mobile */}
                 <div className="flex flex-nowrap overflow-x-auto pb-2 mt-4 gap-2 -mx-1 px-1 scrollbar-hide">
-                  <button
-                    onClick={() => filterJobs("all")}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                      activeFilter === "all"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    All Jobs
-                  </button>
-                  <button
-                    onClick={() => filterJobs("recent")}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                      activeFilter === "recent"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Most Recent
-                  </button>
-                  <button
-                    onClick={() => filterJobs("saved")}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                      activeFilter === "saved"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Saved Jobs
-                  </button>
+                  {/* convert to usestate map as one */}
+                  {filterTab.map(({ title, filter }) => (
+                    <button
+                    key={filter}
+                      onClick={() => filterJobs(filter)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                        activeFilter === filter
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {title}
+                    </button>
+                  ))}
                   <button className="ml-auto flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap">
                     <FunnelIcon className="h-4 w-4" />
                     <span className="hidden sm:inline">Advanced Filters</span>
@@ -155,14 +162,22 @@ export const FreeDash = () => {
               <div className="divide-y divide-gray-100">
                 {filteredJobs.length > 0 ? (
                   filteredJobs.map((job) => (
-                  <JobCard key={job._id} job={job} onSave={() => toggleSaveJob(job._id)} onView={()=> handleNavigate(job)} />
-                ))
+                    <JobCardFrlncr
+                      key={job._id}
+                      job={job}
+                      onSave={() => toggleSaveJob(job._id)}
+                      onView={() => handleNavigate(job)}
+                    />
+                  ))
                 ) : (
                   <div className="p-8 text-center">
                     <BriefcaseIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">No jobs found</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                      No jobs found
+                    </h3>
                     <p className="text-gray-500">
-                      Try adjusting your search or filters to find what you're looking for.
+                      Try adjusting your search or filters to find what you're
+                      looking for.
                     </p>
                   </div>
                 )}
@@ -176,18 +191,33 @@ export const FreeDash = () => {
               <div className="p-4 sm:p-6 border-b border-gray-100">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg sm:text-xl overflow-hidden">
-                    <img src={`${import.meta.env.VITE_BACKEND_URL}/${profile?.profilePicture}`} loading="lazy" alt={profile?.profilePicture} className="h-full w-full object-cover" />
+                    <img
+                      src={`${import.meta.env.VITE_BACKEND_URL}/${
+                        profile?.profilePicture
+                      }`}
+                      loading="lazy"
+                      alt={profile?.profilePicture}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div>
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900">{profile?.user?.fullname}</h2>
-                    <p className="text-sm sm:text-base text-gray-500">{profile?.title} </p>
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                      {profile?.user?.fullname}
+                    </h2>
+                    <p className="text-sm sm:text-base text-gray-500">
+                      {profile?.title}{" "}
+                    </p>
                   </div>
                 </div>
 
                 <div className="mt-4 sm:mt-6 bg-blue-50 rounded-lg p-3 sm:p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">Profile Completion</span>
-                    <span className="text-xs sm:text-sm font-medium text-blue-700">{stats.profileCompletion}%</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">
+                      Profile Completion
+                    </span>
+                    <span className="text-xs sm:text-sm font-medium text-blue-700">
+                      {stats.profileCompletion}%
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
@@ -196,7 +226,8 @@ export const FreeDash = () => {
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    Complete your profile to increase your chances of getting hired.
+                    Complete your profile to increase your chances of getting
+                    hired.
                   </p>
                 </div>
               </div>
@@ -209,21 +240,27 @@ export const FreeDash = () => {
                       <BriefcaseIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span className="text-xs sm:text-sm">Jobs Applied</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.jobsApplied}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                      {stats.jobsApplied}
+                    </p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
                     <div className="flex items-center gap-1 sm:gap-2 text-gray-500 mb-1">
                       <CheckCircleIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span className="text-xs sm:text-sm">Interviews</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.interviews}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                      {stats.interviews}
+                    </p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-3 sm:p-4 col-span-2">
                     <div className="flex items-center gap-1 sm:gap-2 text-gray-500 mb-1">
                       <StarIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span className="text-xs sm:text-sm">Success Rate</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.successRate}%</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                      {stats.successRate}%
+                    </p>
                   </div>
                 </div>
               </div>
@@ -231,7 +268,9 @@ export const FreeDash = () => {
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-4 sm:p-6 border-b border-gray-100">
-                <h3 className="font-medium text-gray-900">Top Skills in Demand</h3>
+                <h3 className="font-medium text-gray-900">
+                  Top Skills in Demand
+                </h3>
               </div>
               <div className="p-4 sm:p-6">
                 <div className="space-y-4">
@@ -250,70 +289,8 @@ export const FreeDash = () => {
         </div>
       </div>
     </div>
-  )
-}
-
-// Job Card Component
-const JobCard = ({ job, onSave, onView }) => {
-  return (
-    <div className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer mb-6"  >
-      <div className="flex justify-between">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-          {job.title}
-        </h2>
-        <button
-          onClick={onSave}
-          className="text-gray-400 hover:text-blue-600 transition-colors ml-2 flex-shrink-0"
-          aria-label={job.saved ? "Unsave job" : "Save job"}
-        >
-          <BookmarkIcon className={`h-5 w-5 ${job.saved ? "fill-blue-600 text-blue-600" : ""}`} />
-        </button>
-      </div>
-
-      <div className="flex items-center gap-2 mt-2">
-        <span className="text-sm sm:text-base text-gray-700">{job.client.fullname  || "default"}</span>
-        <div className="flex items-center">
-          <StarIcon className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-yellow-400" />
-          <span className="text-xs sm:text-sm text-gray-600 ml-1">{job.clientRating || "4.3"}</span>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mt-3">
-        <div className="flex items-center text-gray-700 text-xs sm:text-sm">
-          <CurrencyDollarIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-gray-500" />
-          {formatNaira(job?.budget)}
-        </div>
-        <div className="flex items-center text-gray-700 text-xs sm:text-sm">
-          <ClockIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-gray-500" />
-          {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
-        </div>
-        <div className="flex items-center text-gray-700 text-xs sm:text-sm">
-          <BriefcaseIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-gray-500" />
-          {job?.proposalsToReview} proposals
-        </div>
-      </div>
-
-      <p className="mt-3 text-sm sm:text-base text-gray-600 line-clamp-2">{job?.description}</p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {job?.skills.map((skill) => (
-          <span key={skill} className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded-full">
-            {skill}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        {/* <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-sm">
-          Apply Now
-        </button> */}
-        <button onClick={onView} className="w-full sm:w-auto text-center sm:text-left text-blue-600 hover:text-blue-800 font-medium text-sm">
-          View Details
-        </button>
-      </div>
-    </div>
-  )
-}
+  );
+};
 
 // Skill Demand Component
 const SkillDemand = ({ skill, percentage }) => {
@@ -324,15 +301,18 @@ const SkillDemand = ({ skill, percentage }) => {
         <span className="text-sm text-gray-500">{percentage}%</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
+        <div
+          className="bg-blue-600 h-2 rounded-full"
+          style={{ width: `${percentage}%` }}
+        ></div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Add this CSS helper for horizontal scrolling
 // Add to the head of your document or in a global CSS file
-const style = document.createElement("style")
+const style = document.createElement("style");
 style.textContent = `
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
@@ -341,6 +321,5 @@ style.textContent = `
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-`
-document.head.appendChild(style)
-
+`;
+document.head.appendChild(style);

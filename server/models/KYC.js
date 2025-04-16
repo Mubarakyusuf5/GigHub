@@ -17,7 +17,7 @@ const FreelancerSchema = new mongoose.Schema(
       required: true,
     },
     // workCategory: { type: String, required: true }, // can user have multiple work categories
-    portfolioLinks: { type: String },
+    portfolio: { type: String },
     github: { type: String },
     linkedin: { type: String },
     website: { type: String },
@@ -27,6 +27,10 @@ const FreelancerSchema = new mongoose.Schema(
       accountNumber: { type: String, required: true },
     },
     profilePicture: { type: String, required: true }, // Cloud storage URL
+    reviews:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review"
+    }
     // hasProfile: { type: Boolean, default: false },
   },
   {
@@ -51,6 +55,7 @@ const ClientSchema = new mongoose.Schema(
       enum: ["Individual", "Company"],
       required: true,
     },
+    state: { type: String, required: true },
     industry: { type: String, required: true },
     website: { type: String },
     bankDetails: {
@@ -59,7 +64,11 @@ const ClientSchema = new mongoose.Schema(
       accountName: { type: String, required: true },
       accountNumber: { type: String, required: true },
     },
-    profilePicture: { type: String, default:"/placeholder.svg" }, // Cloud storage URL
+    reviews:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review"
+    }
+    // profilePicture: { type: String, default:"/placeholder.svg" }, // Cloud storage URL
     // hasProfile: { type: Boolean, default: false },
   },
   {

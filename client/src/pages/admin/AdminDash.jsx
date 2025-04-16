@@ -1,16 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ChatCard } from '../../components/cards/ChatCard'
 import { Sidebar } from '../../components/utils/Sidebar'
 import { AdminNav } from '../../components/utils/AdminNav'
 import { DocumentCurrencyDollarIcon } from '@heroicons/react/24/outline'
 
 export const AdminDash = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const handleToggle = () => {
+    setIsOpen((prevIsOpen) => !prevIsOpen)
+  }
   return (
     <div className='flex '>
       {/* <ChatCard /> */}
       <Sidebar />
-      <div className='w-full ml-[240px]'>
-        <AdminNav />
+      <div className='w-full lg:ml-[240px]'>
+        <AdminNav isOpen={isOpen} click={handleToggle} />
         <div className='min-h-[100vh] px-4 lg:px-6 py-8'>
           <div className=' rounded-md flex space-x-3 mb-7'>
             <div className='bg-purple-200 rounded-md p-3 w-full'>

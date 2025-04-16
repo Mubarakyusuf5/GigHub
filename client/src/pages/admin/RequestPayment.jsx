@@ -1,17 +1,17 @@
-"use client"
+import React, { useEffect, useState } from 'react'
+import { Sidebar } from '../../components/utils/Sidebar'
+import { AdminNav } from '../../components/utils/AdminNav'
+// import { AddCategoryModal } from '../../components/modals/category/AddCategoryModal'
+import { AddCategoryModal } from '../../components/modals/category/AddCategoryModal'
+import { UpdateCategoryModal } from '../../components/modals/category/UpdateCategoryModal'
+import { ViewCategoryModal } from '../../components/modals/category/ViewCategoryModal'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { ArrowPathIcon, MagnifyingGlassIcon, PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import DataTable from 'react-data-table-component'
+import { DeleteModal } from '../../components/modals/DeleteModal'
+import { ClipLoader } from 'react-spinners'
 
-import { useEffect, useState } from "react"
-import { MagnifyingGlassIcon, PlusIcon, PencilIcon, TrashIcon, ArrowPathIcon, XMarkIcon, KeyIcon } from "@heroicons/react/24/outline"
-import DataTable from "react-data-table-component"
-import axios from "axios"
-import toast from "react-hot-toast"
-import { AdminNav } from "../../components/utils/AdminNav"
-import { Sidebar } from "../../components/utils/Sidebar"
-import { DeleteModal } from "../../components/modals/DeleteModal"
-import { AddUserModal } from "../../components/modals/user/AddUserModal"
-import { UpdateUserModal } from "../../components/modals/user/UpdateUserModal"
-import { UpdatePasswordModal } from "../../components/modals/user/UpdatePasswordModal"
-// import { useAuth } from "../../Context/AuthContext";
 
 // Custom Action Button component for table actions
 const ActionButton = ({ icon: Icon, onClick, ariaLabel, bgColor }) => (
@@ -28,7 +28,7 @@ const ActionButton = ({ icon: Icon, onClick, ariaLabel, bgColor }) => (
 const customStyles = {
   headRow: {
     style: {
-      backgroundColor: "#ffffff",
+      backgroundColor: "#fff",
       color: "#374151",
       borderBottom: "1px solid #e5e7eb",
       borderTopLeftRadius: "0.75rem",
@@ -52,6 +52,7 @@ const customStyles = {
       paddingRight: "16px",
       paddingTop: "12px",
       paddingBottom: "12px",
+      width: "150px"
     },
   },
   rows: {
@@ -65,141 +66,106 @@ const customStyles = {
       },
     },
   },
-  // pagination: {
-  //   style: {
-  //     borderTop: "1px solid #e5e7eb",
-  //     borderBottomLeftRadius: "0.75rem",
-  //     borderBottomRightRadius: "0.75rem",
-  //   },
-  // },
+  pagination: {
+    style: {
+      borderTop: "1px solid #e5e7eb",
+      borderBottomLeftRadius: "0.75rem",
+      borderBottomRightRadius: "0.75rem",
+    },
+  },
 }
 
-export const ManageUser = () => {
+export const RequestPayment = () => {
   const [showModal, setShowModal] = useState(false)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showViewModal, setShowViewModal] = useState(false)
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [userData, setUserData] = useState([])
+  const [categoryData, setcategoryData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [search, setSearch] = useState("")
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   // const { user } = useAuth();
 
-  const fetchUsers = async () => {
+  const fetchCategory = async () => {
     try {
       setRefreshing(true)
-      const response = await axios.get("/api/user/displayUser")
+      const response = await axios.get("/api/cat/displayCategory")
       const data = response.data
-      setUserData(data)
+      setcategoryData(data)
       setFilteredData(data)
       setLoading(false)
       setRefreshing(false)
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch users")
-      console.error("Failed to fetch users:", error)
+      toast.error(error.response?.data?.message || "Failed to fetch categories")
+      console.error("Failed to fetch categories:", error)
       setLoading(false)
       setRefreshing(false)
     }
   }
 
   useEffect(() => {
-    fetchUsers()
+    fetchCategory()
   }, [])
 
   useEffect(() => {
     if (search.trim() === "") {
-      setFilteredData(userData)
+      setFilteredData(categoryData)
     } else {
-      const filtered = userData.filter((user) => {
+      const filtered = categoryData.filter((cat) => {
         const searchTerm = search.toLowerCase()
         return (
-          (user.fullname && user.fullname.toLowerCase().includes(searchTerm)) ||
-          (user.email && user.email.toLowerCase().includes(searchTerm)) ||
-          (user.role && user.role.toLowerCase().includes(searchTerm)) ||
-          (user.status && user.status.toLowerCase().includes(searchTerm))
+          (cat.category && cat.category.toLowerCase().includes(searchTerm)) ||
+          (cat.skills && cat.skills.includes(searchTerm)) //fix filter
         )
       })
       setFilteredData(filtered)
     }
-  }, [search, userData])
+  }, [search, categoryData])
 
-  const handleUpdateBtn = (userData) => {
-    setSelectedUser(userData)
+  const handleUpdateBtn = (categoryData) => {
+    setSelectedCategory(categoryData)
     setShowUpdateModal(true)
   }
 
-  const handleViewModal = (userData) => {
-    setSelectedUser(userData)
+  const handleViewModal = (categoryData) => {
+    setSelectedCategory(categoryData)
     setShowViewModal(true)
   }
 
-  const handlePasswordModal = (userData) => {
-    setSelectedUser(userData)
-    setShowPasswordModal(true)
-  }
-
-  const handleDeleteModal = (userData) => {
-    setSelectedUser(userData)
+  const handleDeleteModal = (categoryData) => {
+    setSelectedCategory(categoryData)
     setShowDeleteModal(true)
   }
 
   const handleDeleteBtn = async (id) => {
     try {
-      const response = await axios.delete(`/api/user/deleteUser/${id}`)
+      const response = await axios.delete(`/api/cat/deleteCategory/${id}`)
       toast.success(response.data.message)
       setShowDeleteModal(false)
-      fetchUsers()
+      fetchCategory()
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error deleting user. Please try again.")
-      console.error("Failed to delete user:", error)
+      toast.error(error.response?.data?.message || "Error deleting category. Please try again.")
+      console.error("Failed to delete category:", error)
     }
   }
 
   const handleToggle = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen)
-    // console.log(isOpen)
   }
-  // console.log(isOpen)
 
   const columns = [
     {
-      name: "Full Name",
-      selector: (row) => row.fullname,
+      name: "Category",
+      selector: (row) => row.category,
       sortable: true,
     },
     {
-      name: "Email",
-      selector: (row) => row.email,
+      name: "Skills",
+      selector: (row) => row.skills.join(", "),
       sortable: true,
-    },
-    {
-      name: "Role",
-      selector: (row) => row.role,
-      sortable: true,
-    },
-    {
-      name: "Status",
-      selector: (row) => row.status,
-      sortable: true,
-      cell: (row) => (
-        <span
-          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            row.status === "Suspended"
-              ? "bg-yellow-100 text-yellow-800"
-              : row.status === "Active"
-                ? "bg-green-100 text-green-800"
-                : row.status === "Blocked"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-blue-100 text-blue-800"
-          }`}
-        >
-          {row.status}
-        </span>
-      ),
     },
     {
       name: "Actions",
@@ -217,49 +183,34 @@ export const ManageUser = () => {
             ariaLabel="Edit user"
             bgColor="bg-yellow-500"
           />
-          <ActionButton
-            icon={KeyIcon}
-            onClick={() => handlePasswordModal(row)}
-            ariaLabel="update password"
-            bgColor="bg-gray-500"
-          />
-          <ActionButton
-            icon={TrashIcon}
-            onClick={() => handleDeleteModal(row)}
-            ariaLabel="Delete user"
-            bgColor="bg-red-500"
-          />
-          
+          {/* button called make payment or tranfer funds */}
+            {/* <ActionButton
+              icon={TrashIcon}
+              onClick={() => handleDeleteModal(row)}
+              ariaLabel="Delete user"
+              bgColor="bg-red-500"
+            /> */}
         </div>
       ),
-      // ignoreRowClick: true,
-      // allowOverflow: true,
-      // button: true,
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
     },
   ]
-  // console.log(selectedUser._id)
 
   return (
-    <div className="flex min-h-screen ">
+    <div className="flex min-h-screen bg-gray-50 ">
       <Sidebar />
-      <div className=" w-full lg:ml-[240px]">
+      <div className="w-full lg:ml-[240px]">
         <AdminNav isOpen={isOpen} click={handleToggle} />
         <div className="p-6 lg:p-8">
           {/* Header section */}
           <div className="flex flex-col gap-6 mb-8">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#00539c] font-poppins">Manage Users</h1>
-            </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-[#00539c] font-poppins">Payment Request</h1>
+              
 
-            {/* Action Bar */}
-            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <button
-              onClick={() => setShowModal(true)}
-              className="py-2.5 px-4 bg-[#eea47f] text-white rounded-lg hover:bg-[#e8956f] transition-colors flex items-center justify-center shadow-sm"
-            >
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Create New User
-            </button>
+             {/* Action Bar */}
+             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-end">
 
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               {/* Search input */}
@@ -269,7 +220,7 @@ export const ManageUser = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder="Search category or skills..."
                   className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-[#00539c] focus:border-[#00539c] bg-white shadow-sm transition-all duration-200"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -286,7 +237,7 @@ export const ManageUser = () => {
 
               {/* Refresh button */}
               <button
-                onClick={fetchUsers}
+                onClick={fetchCategory}
                 disabled={refreshing}
                 className="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition-all duration-200 text-slate-700"
               >
@@ -304,27 +255,28 @@ export const ManageUser = () => {
             <div className="flex justify-center items-center h-48 bg-white rounded-xl shadow-md border border-slate-200">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 relative">
-                <div className="absolute inset-0 rounded-full border-t-2 border-b-2 border-[#00539c] animate-spin"></div>
-                <div className="absolute inset-2 rounded-full border-r-2 border-l-2 border-[#eea47f] animate-spin animation-delay-150"></div>
+                {/* <div className="absolute inset-0 rounded-full border-t-2 border-b-2 border-[#00539c] animate-spin"></div>
+                <div className="absolute inset-2 rounded-full border-r-2 border-l-2 border-[#eea47f] animate-spin animation-delay-150"></div> */}
+                <ClipLoader className='absolute animate-spin' />
               </div>
-              <p className="text-lg font-medium text-slate-700 mt-4">Loading users...</p>
+              <p className="text-lg font-medium text-slate-700 mt-4">Loading request...</p>
             </div>
           </div>
           ) : (
-            <div className="rounded-xl overflow-x-auto shadow-md">
+            <div className="bg-white rounded-xl overflow-hidden shadow-md">
               <DataTable
                 columns={columns}
                 data={filteredData}
                 pagination
-                // paginationPerPage={10}
-                // paginationRowsPerPageOptions={[10, 25, 50, 100]}
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[10, 25, 50, 100]}
                 customStyles={customStyles}
                 highlightOnHover
                 pointerOnHover
                 responsive
                 noDataComponent={
                   <div className="flex flex-col items-center justify-center p-10">
-                    <p className="text-lg font-medium text-gray-500 mb-2">No users found</p>
+                    <p className="text-lg font-medium text-gray-500 mb-2">No payment request found</p>
                     <p className="text-sm text-gray-400">Try adjusting your search or filters</p>
                   </div>
                 }
@@ -335,19 +287,15 @@ export const ManageUser = () => {
       </div>
 
       {/* Modals */}
-      {showModal && <AddUserModal fetchUsers={fetchUsers} onClose={() => setShowModal(false)} />}
+      {showModal && <AddCategoryModal fetchCategory={fetchCategory} onClose={() => setShowModal(false)} />}
       {showUpdateModal && (
-        <UpdateUserModal userData={selectedUser} fetchUsers={fetchUsers} onClose={() => setShowUpdateModal(false)} />
-      )}
-      {showPasswordModal && (
-        <UpdatePasswordModal userData={selectedUser} fetchUsers={fetchUsers} onClose={() => setShowPasswordModal(false)} />
+        <UpdateCategoryModal categoryData={selectedCategory} fetchCategory={fetchCategory} onClose={() => setShowUpdateModal(false)} />
       )}
       {showDeleteModal && (
-        <DeleteModal onClose={() => setShowDeleteModal(false)} onDelete={() => handleDeleteBtn(selectedUser._id)} />
+        <DeleteModal onClose={() => setShowDeleteModal(false)} onDelete={() => handleDeleteBtn(selectedCategory._id)} />
       )}
-      {showViewModal && <ViewUserModal onClose={() => setShowViewModal(false)} userData={selectedUser} />}
+      {showViewModal && <ViewCategoryModal onClose={() => setShowViewModal(false)} categoryData={selectedCategory} />}
     </div>
   )
-  
 }
 

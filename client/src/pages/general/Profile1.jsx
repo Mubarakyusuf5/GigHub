@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-export const Profile = () => {
+export const Profile1 = () => {
   // This would come from your database in a real implementation
   const [freelancer, setFreelancer] = useState({
     userId: "60d0fe4f5311236168a109ca",
@@ -62,7 +62,7 @@ export const Profile = () => {
       {/* Profile Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 h-48 sm:h-64"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" px-4 sm:px-6 lg:px-8">
         <div className="relative -mt-16 sm:-mt-24">
           {/* Profile Card */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">

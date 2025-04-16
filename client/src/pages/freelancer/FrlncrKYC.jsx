@@ -75,6 +75,7 @@ export const FrlncrKYC = ({
     if (step === 4 && !(await validateStep4())) return;
     setStep(step + 1);
   };
+  
   const handleBack = () => setStep(step - 1);
   const handleChange = (e) => {
     if (e && e.target && e.target.name) {
@@ -218,20 +219,24 @@ export const FrlncrKYC = ({
         profilePicture,
       } = formData;
 
-      if (!accountName || !accountNumber || !bankName) {
+      if (!accountNumber || !bankName) {
         toast.error("All bank details must be provided");
+        return
       }
 
       if (!title || !skills || !bio || !experienceLevel) {
         toast.error("All basic details must be provided");
+        return
       }
 
       if (!state) {
         toast.error("Location must be provided");
+        return
       }
 
       if (!profilePicture) {
         toast.error("Profile picture must be provided");
+        return
       }
 
       console.log({...formData, accountName: accountDetail?.account_name});
@@ -261,6 +266,7 @@ export const FrlncrKYC = ({
         profilePicture: "",
       });
     } catch (error) {
+      console.log(error)
       toast.error(
         error.response?.data?.message ||
           "Error creating profile, please try again..."
@@ -293,7 +299,7 @@ export const FrlncrKYC = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -651,7 +657,7 @@ export const FrlncrKYC = ({
                       Select your Bank Name
                     </option>
                     {bankDetails?.length > 0 ? (
-                      bankDetails.map(({ name, code, id }) => (
+                      bankDetails.map(({ name, id }) => (
                         <option key={id} value={name}>
                           {name}
                         </option>
@@ -787,179 +793,6 @@ export const FrlncrKYC = ({
               </div>
             )}
 
-            {step === 6 && (
-              <div className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Profile Summary
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Professional Title
-                      </h4>
-                      <p className="mt-1">{formData.title || "Not provided"}</p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Experience Level
-                      </h4>
-                      <p className="mt-1">
-                        {formData.experienceLevel
-                          ? {
-                              entry: "Entry Level (0-2 years)",
-                              intermediate: "Intermediate (2-5 years)",
-                              expert: "Expert (5-10 years)",
-                              senior: "Senior (10+ years)",
-                            }[formData.experienceLevel]
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    {/* <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Availability
-                      </h4>
-                      <p className="mt-1">
-                        {formData.availability
-                          ? {
-                              "full-time": "Full-time (40+ hrs/week)",
-                              "part-time": "Part-time (20-30 hrs/week)",
-                              limited: "Limited (10-20 hrs/week)",
-                              occasional: "Occasional (Less than 10 hrs/week)",
-                            }[formData.availability]
-                          : "Not provided"}
-                      </p>
-                    </div> */}
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Account Name
-                      </h4>
-                      <p className="mt-1">
-                        {formData.accountName
-                          ? `${formData.accountName}`
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Account Number
-                      </h4>
-                      <p className="mt-1">
-                        {formData.accountNumber
-                          ? `${formData.accountNumber}`
-                          : "Not provided"}
-                      </p>
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Skills
-                      </h4>
-                      <div className="mt-1 flex flex-wrap gap-2">
-                        {formData.skills.length > 0 ? (
-                          formData.skills.map((skill, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
-                            >
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          <p>No skills provided</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">Bio</h4>
-                      <p className="mt-1">{formData.bio || "Not provided"}</p>
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <h4 className="text-sm font-medium text-gray-500">
-                        Links
-                      </h4>
-                      <ul className="mt-1 space-y-1">
-                        <li>
-                          {formData.portfolio ? (
-                            <a
-                              href={formData.portfolio}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              Portfolio Website
-                            </a>
-                          ) : (
-                            "No portfolio provided"
-                          )}
-                        </li>
-                        <li>
-                          {formData.github ? (
-                            <a
-                              href={formData.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              GitHub Profile
-                            </a>
-                          ) : (
-                            "No GitHub profile provided"
-                          )}
-                        </li>
-                        <li>
-                          {formData.linkedin ? (
-                            <a
-                              href={formData.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              LinkedIn Profile
-                            </a>
-                          ) : (
-                            "No LinkedIn profile provided"
-                          )}
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="h-5 w-5 text-yellow-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        By completing your profile, you agree to our Terms of
-                        Service and Privacy Policy.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
             {step > 1 ? (

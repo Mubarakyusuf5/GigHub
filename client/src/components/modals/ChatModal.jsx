@@ -64,7 +64,7 @@ export const ChatModal = () => {
       <div className="bg-white w-full h-full flex flex-col">
         {/* Header */}
         <div className="flex justify-start items-center p-3 border-b space-x-4 lg:space-x-0">
-          <button className="lg:hidden text-gray-500 hover:text-gray-700">
+          <button className="md:hidden text-gray-500 hover:text-gray-700">
             <ArrowLeftIcon className="h-6 w-6" />
           </button>
           <h2 className="text-xl font-semibold">Chat with AI</h2>

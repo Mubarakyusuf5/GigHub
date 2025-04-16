@@ -26,10 +26,10 @@ router.post("/createFrlncrProfile", upload.single("profilePicture"),
 VerifyToken, authorizeRoles("Admin", "Freelancer"), 
 createFreelancer);
 router.get("/displayFrlncrProfile", 
-  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  VerifyToken, authorizeRoles("Admin", "Freelancer", "Client"),
   displayFreelancer);
 router.get("/displayFrlncrProfileById/:id", 
-  VerifyToken, authorizeRoles("Admin", "Freelancer"),
+  // VerifyToken, authorizeRoles("Admin", "Freelancer", "Client"),
   displayFreelancerById);
 router.put("/updateFrlncrProfile/:id", 
   VerifyToken, authorizeRoles("Admin", "Freelancer"),
@@ -43,10 +43,10 @@ router.post("/createClientProfile",
   VerifyToken, authorizeRoles("Admin", "Client"), 
   createClient);
   router.get("/displayClientProfile", 
-    VerifyToken, authorizeRoles("Admin", "Client"),
+    VerifyToken, authorizeRoles("Admin", "Client", "Freelancer"),
     displayClient);
 router.get("/displayClientProfileById/:id", 
-  VerifyToken, authorizeRoles("Admin", "Client"), 
+  VerifyToken, authorizeRoles("Admin", "Client", "Freelancer"), 
   getClient);
 router.put("/updateClientProfile/:id", 
   VerifyToken, authorizeRoles("Admin", "Client"), 

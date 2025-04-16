@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import toast from "react-hot-toast"
 import { CheckIcon, MagnifyingGlassIcon, MinusIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { formatNaira } from "../../components/Data"
 
 export const TestDetails = ({ onClose, fetchJobs }) => {
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ export const TestDetails = ({ onClose, fetchJobs }) => {
     skills: [],
   })
   const [platformFeePercentage, setPlatformFeePercentage] = useState(3)
+  const [platformFee, setPlatformFee] = useState(0)
 
   // State for skills input and dropdown
   const [skills, setSkills] = useState([]) //replace skill array from backend
@@ -66,6 +68,11 @@ export const TestDetails = ({ onClose, fetchJobs }) => {
       ...prev,
       [name]: value,
     }))
+
+    if (name === "budget" && value){
+      const calculatedFee = (Number.parseFloat(value) * platformFeePercentage) / 100
+      setPlatformFee(calculatedFee)
+    }
   }
 
   const calculatePlatformFee = (budgetAmount) => {
@@ -162,37 +169,38 @@ export const TestDetails = ({ onClose, fetchJobs }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Validate form
-    if (!formData.title.trim()) {
-      toast.error("Job title is required")
-      return
-    }
+    // // Validate form
+    // if (!formData.title.trim()) {
+    //   toast.error("Job title is required")
+    //   return
+    // }
 
-    if (!formData.budget.trim()) {
-      toast.error("Budget is required")
-      return
-    }
+    // if (!formData.budget.trim()) {
+    //   toast.error("Budget is required")
+    //   return
+    // }
 
-    if (!formData.description.trim()) {
-      toast.error("Job description is required")
-      return
-    }
+    // if (!formData.description.trim()) {
+    //   toast.error("Job description is required")
+    //   return
+    // }
 
-    if (formData.skills.length === 0) {
-      toast.error("At least one skill is required")
-      return
-    }
+    // if (formData.skills.length === 0) {
+    //   toast.error("At least one skill is required")
+    //   return
+    // }
 
     // Calculate platform fee
-    const platformFee = calculatePlatformFee(formData.budget)
+    // const platformFee = calculatePlatformFee(formData.budget)
 
     // Filter out empty requirements
     const cleanedFormData = {
       ...formData,
       requirements: formData.requirements.filter((req) => req.trim() !== ""),
-      platformFee: platformFee,
+      platformFee,
       totalAmount: Number.parseFloat(formData.budget) + platformFee,
     }
+    console.log(cleanedFormData)
     try {
       const response = await axios.post("/api/job/createJobs", cleanedFormData)
       toast.success(response.data?.message || "Job posted successfully!")
@@ -258,7 +266,7 @@ export const TestDetails = ({ onClose, fetchJobs }) => {
                   placeholder="e.g. 10000"
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {formData.budget && !isNaN(formData.budget) && Number.parseFloat(formData.budget) > 0 && (
+                {/* {formData.budget && !isNaN(formData.budget) && Number.parseFloat(formData.budget) > 0 && (
                   <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-700">
                       <span className="font-medium">Platform fee ({platformFeePercentage}%):</span> ₦
@@ -269,7 +277,17 @@ export const TestDetails = ({ onClose, fetchJobs }) => {
                       {(Number.parseFloat(formData.budget) + calculatePlatformFee(formData.budget)).toLocaleString()}
                     </p>
                   </div>
-                )}
+                )} */}
+                {formData.budget && <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                                      <p className="text-sm text-gray-700">
+                                        <span className="font-medium">Platform fee ({platformFeePercentage}%):</span>{" "}
+                                        {formData.budget ? formatNaira(platformFee) : "₦0.00"}
+                                      </p>
+                                      <p className="text-sm text-gray-700 mt-1">
+                                        <span className="font-medium">Total you'll pay:</span>{" "}
+                                        {formData.budget ? formatNaira(Number.parseFloat(formData.budget) + platformFee) : "₦0.00"}
+                                      </p>
+                                    </div>}
               </div>
 
               <div>

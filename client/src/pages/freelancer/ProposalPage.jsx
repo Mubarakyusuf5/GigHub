@@ -56,7 +56,6 @@ export const ProposalPage = () => {
       ...prev,
       [name]: value,
     }));
-
         // Calculate fee when bid amount changes
         if (name === "bidAmount" && value) {
           const calculatedFee = (Number.parseFloat(value) * feePercentage) / 100
@@ -74,9 +73,8 @@ export const ProposalPage = () => {
       if(!duration || !payment || !bidAmount || !coverLetter){
         return toast.error("All field must be filled")
       }
-      console.log(proposal)
-      const response = await axios.post(`/api/job/submitProposal/${id}`, {...proposal, freelancer: user?.id, platformFee});
-      console.log(response)
+      // console.log({...proposal, freelancer: user?.id, platformFee})
+      const response = await axios.post(`/api/job/submitProposal/${id}`, {...proposal, platformFee});
       toast.success( response.data.message || "Proposal submitted successfully");
       navigate(-1)
       // Reset form
@@ -110,9 +108,9 @@ export const ProposalPage = () => {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Job Details Card */}
-          <div className="w-full lg:w-1/3 lg:sticky top-20 self-start">
+          <div className="w-full lg:w-1/3 lg:sticky top-20 self-start border rounded-md">
             <div className="bg-white rounded-xl shadow-sm  overflow-hidden">
-              <div className="px-6 pt-6 pb-3 border-b border-gray-100">
+              <div className="px-6 pt-6 pb-3 border-b ">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Job Details
                 </h2>
@@ -157,7 +155,7 @@ export const ProposalPage = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-gray-100">
+                <div className="mt-6 pt-6 border-t ">
                   <div className="flex items-center text-blue-600">
                     <CheckCircleIcon className="h-5 w-5 mr-2" />
                     <span className="text-sm font-medium">
@@ -184,9 +182,9 @@ export const ProposalPage = () => {
           </div>
 
           {/* Proposal Form */}
-          <div className="w-full lg:w-2/3">
+          <div className="w-full lg:w-2/3 border rounded-md">
             <div className="bg-white rounded-xl shadow-sm  overflow-hidden">
-              <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+              <div className="px-6 pt-6 pb-4 border-b ">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Your Proposal
                 </h2>
@@ -221,7 +219,7 @@ export const ProposalPage = () => {
                       The client's budget is{" "}
                       {job?.budget ? formatNaira(job.budget) : "not specified"}
                     </p>
-                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                    {proposal.bidAmount && <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-gray-700">
                         <span className="font-medium">Platform fee ({feePercentage}%):</span>{" "}
                         {proposal.bidAmount ? formatNaira(platformFee) : "₦0.00"}
@@ -230,7 +228,7 @@ export const ProposalPage = () => {
                         <span className="font-medium">You'll receive:</span>{" "}
                         {proposal.bidAmount ? formatNaira(Number.parseFloat(proposal.bidAmount) - platformFee) : "₦0.00"}
                       </p>
-                    </div>
+                    </div>}
                   </div>
 
                   <div className="space-y-2">

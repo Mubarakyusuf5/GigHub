@@ -99,11 +99,11 @@ const jobSchema = new mongoose.Schema(
             required: true,
           },
           bidAmount: {
-            type: String,
+            type: Number,
             required: true,
           },
           platformFee: {
-            type: String,
+            type: Number,
             required: true,
           },
           payment: {
@@ -141,7 +141,11 @@ const jobSchema = new mongoose.Schema(
       default: false,
     },
     platformFee: {
-    type: String,
+    type: Number,
+    required: true
+   },
+    totalAmount: {
+    type: Number,
     required: true
    }
   },

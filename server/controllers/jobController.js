@@ -14,6 +14,7 @@ exports.createJob = async (req, res) => {
       category,
       description,
       platformFee,
+      totalAmount,
       requirements,
       skills,
     } = req.body;
@@ -29,6 +30,7 @@ exports.createJob = async (req, res) => {
       proposalsToReview,
       hires,
       platformFee,
+      totalAmount,
       category,
       description,
       requirements,
@@ -57,6 +59,19 @@ exports.displayJobs = async (req, res) => {
   }
 };
 
+// exports.displayJobsBySkill = async (req, res) => {
+//   try {
+//     const jobs = await Job.find().populate({ path: "client" }) // Fetch name and email
+//     .populate({ path: "hired.freelancer" }) // Fetch name and profile picture
+//     .populate({ path: "proposals.freelancer"});
+//     res.status(200).json(jobs);
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ message: "Error fetching jobs", error: error.message });
+//   }
+// };
+
 // Get all jobs for client each (private)
 exports.displayJobsClient = async (req, res) => {
   try {
@@ -70,7 +85,7 @@ exports.displayJobsClient = async (req, res) => {
       .json({ message: "Error fetching jobs", error: error.message });
   }
 };
-
+ 
 // Get a single job by ID (Public)
 exports.displayJobById = async (req, res) => {
   try {
@@ -145,7 +160,7 @@ exports.hireFreelancer = async (req, res) => {
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-
+// if hired an email will be sent 
     // Use $addToSet to prevent duplicates and ensure atomic update
     const hiredJob = await Job.findByIdAndUpdate(
       req.params.id,
@@ -160,49 +175,57 @@ exports.hireFreelancer = async (req, res) => {
   }
 };
 
-exports.removeHiredFreelancer = async (req, res) => {
+exports.unHiredFreelancer = async (req, res) => {
   try {
     const { freelancer } = req.body;
-// console.log(freelancer)
+
     // Validate freelancerId
     if (!freelancer) {
       return res.status(400).json({ message: "Freelancer ID is required" });
     }
 
     const job = await Job.findById(req.params.id);
-
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-
-    // Use $addToSet to prevent duplicates and ensure atomic update
-    const unHireJob = await Job.findByIdAndDelete(
+// if unhired an email will be sent
+    // Remove the freelancer from the hired list
+    const unHireJob = await Job.findByIdAndUpdate(
       req.params.id,
-      // refine to delete
-      { $push: { hired: {freelancer} } }, 
-      { new: true }
+      { $pull: { hired: freelancer } }, // Correct removal operation
+      { new: true } // Returns updated job document
     );
 
-    res.status(200).json({ message: "Freelancer unhired successfully", job: unHireJob });
+    res.status(200).json({ message: "Freelancer removed successfully", job: unHireJob });
   } catch (error) {
-    res.status(500).json({ message: "Error unhiring freelancer", error});
-    console.log(error)
+    console.error(error);
+    res.status(500).json({ message: "Error removing freelancer", error });
   }
-}
+};
+
 
 // Submission of proposals (Client only)
 exports.submitProposal = async (req, res) => {
   try {
-    const { freelancer, coverLetter, duration, platformFee, bidAmount, payment, milestone } = req.body;
-
+    const { coverLetter, duration, platformFee, bidAmount, payment, milestone } = req.body;
+    const freelancer = req.user?.id
     if (!freelancer) {
       return res.status(400).json({ message: "Freelancer ID is required" });
     }
-
+// if proposal is submitted an email will be sent to client
     // Find the job
     const job = await Job.findById(req.params.id);
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
+    }
+
+    // proposal submitted should'nt go above proposals to review
+    if(job.proposals.length > job.proposalsToReview){
+      return res.status(400).json({ message: "Proposal submission have been maxed out" });
+    }
+
+    if(bidAmount > job.budget){
+      return res.status(400).json({ message: "Bid amount cannot go above client budget" });
     }
 
     // Check if the freelancer has already submitted a proposal for this job

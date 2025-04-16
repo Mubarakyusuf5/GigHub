@@ -21,13 +21,13 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const { data } = await axios.get('/auth/protected');
-        if (data.user) {
-          setUser(data.user);
-          localStorage.setItem("user", JSON.stringify(data.user));
+        if (data?.user) {
+          setUser(data?.user);
+          localStorage.setItem("user", JSON.stringify(data?.user));
         }
       } catch (error) {
         toast.error(error.response?.data?.message)
-        console.error("Error fetching user", error);
+        // console.error("Error fetching user", error);
       }
     };
     fetchUser();

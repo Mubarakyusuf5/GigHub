@@ -8,6 +8,7 @@ const {
   hireFreelancer,
   displayJobsClient,
   submitProposal,
+  unHiredFreelancer,
 } = require("../controllers/jobController");
 
 const router = express.Router();
@@ -35,6 +36,9 @@ router.delete("/deletejob/:id",
 router.post("/hireFreelancer/:id", 
   VerifyToken, authorizeRoles("Client"), 
   hireFreelancer);
+router.post("/unHireFreelancer/:id", 
+  VerifyToken, authorizeRoles("Client"), 
+  unHiredFreelancer);
 router.post("/submitProposal/:id", 
   VerifyToken, authorizeRoles("Client", "Freelancer"), 
   submitProposal);

@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import {
   XMarkIcon,
   UserCircleIcon,
@@ -11,28 +8,30 @@ import {
   UserIcon,
   FlagIcon,
 } from "@heroicons/react/24/outline"
+import { formatNaira } from "../../Data"
+import { Link } from "react-router-dom"
 
 export const ViewProposal = ({ onClose, proposalData }) => {
     
 
-
+// console.log(proposalData.freelancer._id) 
   // Calculate total milestone amount
 //   const totalMilestoneAmount = proposals.milestone.reduce((total, m) => total + m.amount, 0)
-
+// get freelancer id but how?
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed top-0 w-full h-full left-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div
-        className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden max-h-[100vh] flex flex-col"
+        className="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         // onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex justify-between items-center flex-shrink-0">
-          <h1 className="text-xl font-semibold text-white flex items-center">
-            <DocumentTextIcon className="h-5 w-5 mr-2" />
+        <div className="border-b px-6 py-4 flex justify-between items-center flex-shrink-0">
+          <h1 className="text-xl font-semibold text-gray-900 flex items-center">
+            {/* <DocumentTextIcon className="h-5 w-5 mr-2" /> */}
             Proposals Details
           </h1>
           <button
-            className="text-white hover:bg-blue-800/50 rounded-full p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30"
+            className="  text-gray-400 hover:text-gray-500 rounded-full p-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30"
             onClick={onClose}
             aria-label="Close"
           >
@@ -51,15 +50,16 @@ export const ViewProposal = ({ onClose, proposalData }) => {
               <div className="ml-3">
                 <h2 className="text-lg font-semibold text-gray-900">{proposalData.freelancer.fullname}</h2>
                 <p className="text-sm text-gray-500">{"freelancer.title"}</p>
-                <button className="mt-1 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                <Link to={`/profileFree/${proposalData.freelancer._id}`} className="mt-1 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                
                   <UserIcon className="h-4 w-4 mr-1" />
                   View Profile
-                </button>
+                </Link>
               </div>
             </div>
 
             {/* Proposals Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="flex flex-col-reverse gap-4 mt-4">
               <div>
                 {/* Cover Letter */}
                 <div className="mb-4">
@@ -72,24 +72,16 @@ export const ViewProposal = ({ onClose, proposalData }) => {
                   </div>
                 </div>
 
-                {/* Duration */}
-                <div>
-                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider flex items-center mb-1.5">
-                    <ClockIcon className="h-4 w-4 mr-1.5 text-blue-600" />
-                    Duration
-                  </h2>
-                  <p className="text-gray-900 font-medium">{proposalData?.duration}</p>
-                </div>
               </div>
 
-              <div>
+              <div className="flex flex-wrap space-x-4">
                 {/* Bid Amount */}
-                <div className="mb-4">
+                <div className="">
                   <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider flex items-center mb-1.5">
                     <CurrencyDollarIcon className="h-4 w-4 mr-1.5 text-blue-600" />
                     Bid Amount
                   </h2>
-                  <p className="text-gray-900 font-medium text-lg">${proposalData?.bidAmount}</p>
+                  <p className="text-gray-900 font-medium text-lg">{formatNaira(proposalData?.bidAmount)}</p>
                 </div>
 
                 {/* Payment */}
@@ -101,6 +93,15 @@ export const ViewProposal = ({ onClose, proposalData }) => {
                   <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {proposalData?.payment}
                   </div>
+                </div>
+                
+                {/* Duration */}
+                <div>
+                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider flex items-center mb-1.5">
+                    <ClockIcon className="h-4 w-4 mr-1.5 text-blue-600" />
+                    Duration
+                  </h2>
+                  <p className="text-gray-900 font-medium">{proposalData?.duration}</p>
                 </div>
               </div>
             </div>
@@ -144,9 +145,9 @@ export const ViewProposal = ({ onClose, proposalData }) => {
           >
             Close
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+          {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
             Accept Proposals
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

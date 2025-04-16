@@ -37,7 +37,7 @@ const ActionButton = ({ icon: Icon, onClick, ariaLabel, bgColor }) => (
 const customStyles = {
   headRow: {
     style: {
-      backgroundColor: "#f9fafb",
+      backgroundColor: "#fff",
       color: "#374151",
       borderBottom: "1px solid #e5e7eb",
       borderTopLeftRadius: "0.75rem",
@@ -238,16 +238,14 @@ export const Transactions = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 ml-[240px]">
-        <AdminNav />
+      <div className="w-full lg:ml-[240px]">
+        <AdminNav isOpen={isOpen} click={handleToggle} />
         <div className="p-6 lg:p-8">
           {/* Header section */}
           <div className="flex flex-col gap-6 mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <h1 className="text-2xl md:text-3xl font-bold text-[#00539c] font-poppins">
                 Transaction History
               </h1>
-            </div>
 
             {/* Action Bar */}
             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-end">
@@ -325,7 +323,7 @@ export const Transactions = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl overflow-hidden shadow-md">
+            <div className="rounded-xl border overflow-x-auto shadow-md">
               <DataTable
                 columns={columns}
                 data={filteredData}

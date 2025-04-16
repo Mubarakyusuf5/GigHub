@@ -2,7 +2,7 @@ const { Freelancer, Client } = require("../models/KYC");
 const Users = require("../models/userModel");
 const fs = require("fs");
 
-// Create a new freelancer profile (Only one per user)
+// Creating a new freelancer profile 
 const createFreelancer = async (req, res) => {
   const userId = req.user?.id;
   try {
@@ -46,7 +46,7 @@ const createFreelancer = async (req, res) => {
     await Users.findByIdAndUpdate(userId, { hasProfile: true });
 
     const profilePicture = req.file ? req.file.path.replace(/\\/g, "/") : "";
-console.log(profilePicture)
+// console.log(profilePicture)
     console.log(req.body);
     console.log(req.file);
 
@@ -82,7 +82,7 @@ console.log(profilePicture)
 };
 
 // Get a freelancer
-const displayFreelancer = async (req, res) => {
+const displayFreelancer = async (req, res) => { //this will be removed using the function with id
   try {
     const freelancer = await Freelancer.find({user: req.user.id}).populate({
       path: "user",
@@ -95,24 +95,24 @@ const displayFreelancer = async (req, res) => {
     res.status(500).json({ message: "Error displaying profile", error });
     console.log(error)
   }
-};
+}; 
 
 // Get a freelancer by ID
 const displayFreelancerById = async (req, res) => {
   try {
-    const freelancer = await Freelancer.findById(req.params.id).populate({
-      path: "User",
+    const freelancer = await Freelancer.find({user: req.params.id}).populate({
+      path: "user",
     });
+    // const freelancer = await Freelancer.findById(req.params.id).populate({
+    //   path: "user",
+    // });
+    // console.log(freelancer)
     if (!freelancer) {
       return res.status(404).json({ message: "Freelancer not found" });
     }
     res.status(200).json({ freelancer });
   } catch (error) {
-    if (req.file && req.file.path) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) console.error("Error deleting file:", err);
-      });
-    }
+    console.log("byId free", error)
     res.status(500).json({ message: "Error displaying profile", error });
   }
 };

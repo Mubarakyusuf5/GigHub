@@ -1,17 +1,13 @@
-
-
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { toast } from "react-hot-toast"
-// import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react"
-
-
 import { PostJobModal } from "../../components/modals/job/PostJobModal"
 import { UpdateJobModal } from "../../components/modals/job/UpdateJobModal"
 import { DeleteModal } from "../../components/modals/DeleteModal"
 import { PlusIcon  } from "@heroicons/react/24/outline"
 import { JobCard } from "../../components/cards/JobCard"
+import { ClipLoader } from "react-spinners"
 
 export const ClientDash = () => {
   const [showModal, setShowModal] = useState(false)
@@ -20,11 +16,9 @@ export const ClientDash = () => {
   const [jobData, setJobData] = useState([])
   const [selectedJob, setSelectedJob] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState("")
   const navigate = useNavigate()
 
-  // const handleNavigate = () => {
-  //   navigate("/client/job-details")
-  // }
 
   const handleNavigate = (job) => {
     navigate(`/client/job-details/${job._id}`, { state: { job } })
@@ -45,7 +39,22 @@ export const ClientDash = () => {
 
   useEffect(() => {
     fetchJobs()
-  }, []) //Fixed useEffect dependency
+  }, []) 
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`/api/profile/displayClientProfile`)
+      // console.log(response.data.client[0])
+      setProfile(response.data.client[0])
+      
+    } catch (error) {
+      console.log("clientDash", error)
+      toast.error(error.response?.data?.message || "Error displaying profile!")
+    }
+  }
+  useEffect(() => {
+    fetchProfile()
+  }, [])
 
   const handleUpdateBtn = (job) => {
     setSelectedJob(job)
@@ -70,12 +79,12 @@ export const ClientDash = () => {
   }
 
   return (
-    <div className="max-w-7xl bg-gray-50 mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Welcome, Clientname</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Welcome, {profile.companyName}</h1>
               <p className="text-gray-500">Manage your job postings and applications</p>
             </div>
             {jobData.length > 0 && <button
@@ -94,10 +103,9 @@ export const ClientDash = () => {
             <div className=" space-y-4">
               {loading ? (
                 // <div className="flex justify-center items-center h-48 bg-white rounded-xl shadow-md border border-slate-200">
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center py-5">
                   <div className="w-16 h-16 relative">
-                    <div className="absolute inset-0 rounded-full border-t-2 border-b-2 border-[#00539c] animate-spin"></div>
-                    <div className="absolute inset-2 rounded-full border-r-2 border-l-2 border-[#eea47f] animate-spin animation-delay-150"></div>
+                  <ClipLoader className="absolute animate-spin" size={45} color="blue" />
                   </div>
                   <p className="text-lg font-medium text-slate-700 mt-4">Loading Jobs...</p>
                 </div>
